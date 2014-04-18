@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Rendezvous Fight</title>
+	<link href="rf.css" rel="stylesheet" type="text/css">
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="rf.js"></script>
+</head>
+<body>
+	<div id="Setup">
+		<form id="InitialSetup">
+			<table class="FrameTable"><tr><td>
+			<fieldset id="Fighter1" class="StatBlock FormContainer">
+			<legend>Fighter One</legend>
+			<label>Name:</label> <input type="text" size="30" name="Name" value="Fighter One" /><br />
+			<br />
+			<label>Strength:</label> <input type="text" size="3" name="Strength" value="4" /><br />
+			<label>Dexterity:</label> <input type="text" size="3" name="Dexterity" value="4" /><br />
+			<label>Endurance:</label> <input type="text" size="3" name="Endurance" value="4" /><br />
+			<label>Intellect:</label> <input type="text" size="3" name="Intellect" value="4" /><br />
+			<label>Willpower:</label> <input type="text" size="3" name="Willpower" value="4" /><br />
+			<br />
+			<label>HP:</label> <input type="text" size="3" name="HP" value="100" /><br />
+			<label>Mana:</label> <input type="text" size="3" name="Mana" value="100" /><br />
+			<label>Stamina:</label> <input type="text" size="3" name="Stamina" value="100" /><br />
+			<label>Cloth:</label> <input type="text" size="3" name="Cloth" value="100" /><br />
+			</fieldset>
+			</td><td>
+			<fieldset id="Fighter2" class="StatBlock FormContainer">
+			<legend>Fighter Two</legend>
+			<label>Name:</label> <input type="text" size="30" name="Name" value="Fighter Two" /><br />
+			<br />
+			<label>Strength:</label> <input type="text" size="3" name="Strength" value="4" /><br />
+			<label>Dexterity:</label> <input type="text" size="3" name="Dexterity" value="4" /><br />
+			<label>Endurance:</label> <input type="text" size="3" name="Endurance" value="4" /><br />
+			<label>Intellect:</label> <input type="text" size="3" name="Intellect" value="4" /><br />
+			<label>Willpower:</label> <input type="text" size="3" name="Willpower" value="4" /><br />
+			</div>
+			<br />
+			<label>HP:</label> <input type="text" size="3" name="HP" value="100" /><br />
+			<label>Mana:</label> <input type="text" size="3" name="Mana" value="100" /><br />
+			<label>Stamina:</label> <input type="text" size="3" name="Stamina" value="100" /><br />
+			<label>Cloth:</label> <input type="text" size="3" name="Cloth" value="100" /><br />
+			</fieldset>
+			</td></tr><tr><td colspan="2">
+			<input type="submit" value="Check and Submit" class="WideButton" />
+			<div id="ErrorResult" class="ErrorBox"></div>
+			</td></td></table>
+		</form>
+	</div>
+
+	<div id="Gameplay">
+		<form id="CombatInput">
+			<table class="FrameTable"><tr><td>
+			<fieldset id="Action" class="FormContainer RadioList">
+				<legend>Action</legend>
+				<input type="radio" name="action" value="Light" id="Light" disabled="disabled" /><label for="Light">Light</label><br />
+				<input type="radio" name="action" value="Heavy" id="Heavy" disabled="disabled" /><label for="Heavy">Heavy</label><br />
+				<input type="radio" name="action" value="Grab" id="Grab" disabled="disabled" /><label for="Grab">Grab</label><br />
+				<input type="radio" name="action" value="Damage/Rip Clothes" id="Rip" disabled="disabled" /><label for="Rip">Damage/Rip Clothes</label><br />
+				<input type="radio" name="action" value="Tackle" id="Tackle" disabled="disabled" /><label for="Tackle">Tackle</label><br />
+				<input type="radio" name="action" value="Magic/Ranged" id="Ranged" disabled="disabled" /><label for="Ranged">Magic/Ranged</label><br />
+				<input type="radio" name="action" value="Skip/Rest" id="Rest" disabled="disabled" /><label for="Rest">Skip/Rest</label><br />
+				<input type="radio" name="action" value="Run Away" id="Run" disabled="disabled" /><label for="Run">Run Away</label><br />
+			</fieldset>
+			</td><td rowspan="0" class="FullHeightCell"><div id="CombatResult" class="ResultBox">Results...</div>
+			</td></tr><tr><td>
+			<input type="submit" value="As Fighter One" id="F1_Action" class="WideButton" disabled="disabled"> 
+			<input type="submit" value="As Fighter Two" id="F2_Action" class="WideButton" disabled="disabled">
+			</td></tr></table>
+		</form>
+	</div>
+</body>
+</html>

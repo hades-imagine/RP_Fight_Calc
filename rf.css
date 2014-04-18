@@ -1,0 +1,79 @@
+fieldset {
+	padding: 0.5em;
+	background-color:#fafafa;
+	border: none;
+}
+	
+legend {
+	margin: 0px -0.5em;
+	padding: 0.2em 0.5em;
+	background-color:#f0f0f0;
+	width: 100%;
+}
+	
+.StatBlock label {
+	display:inline-block;
+	width: 5em;		
+}
+
+.FormContainer {
+	display:inline-block;
+	border: none;
+	width: 20em;
+}
+	
+.ResultBox {
+	padding: 0em;
+	margin: 0.5em;
+}
+	
+.ErrorBox {
+	width: 40em;
+	padding: 0.25em;
+	color: #d00;
+	text-align: center;
+}
+	
+table.FrameTable {
+	padding: 0em;
+	margin: 0.5em;
+}
+
+td.FullHeightCell {
+	background-color:#fafafa;
+	vertical-align: top;
+	min-width: 20em;
+}
+
+.WideButton {
+	width: 100%;
+}
+
+.RadioList {
+	padding: 0em 0.5em;
+}
+
+.RadioList input[type=radio],
+.RadioWide input[type=radio] {
+	display:none; 
+}
+	
+.RadioList input[type=radio] + label {
+	display:inline-block;
+	width: 100%;
+	margin: 0px -0.5em;
+	padding: 4px 0.5em;
+}
+	
+.RadioWide input[type=radio] + label {
+	display:inline-block;
+	width: 1em;
+	margin: 0em;
+	padding: 4px 0.125em;
+	text-align: center;
+}
+
+.RadioWide input[type=radio]:checked + label,
+.RadioList input[type=radio]:checked + label { 
+	background-color:#f0e0a0;
+}
