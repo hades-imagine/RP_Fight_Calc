@@ -288,7 +288,8 @@ $(document).ready(function () {
 		this._maxMana = this._intellect * 10;
 		this._maxStamina = 100;
 	
-		this.hp = clamp( settings.HP, 0, this._maxHP);
+		//this.hp = clamp( settings.HP, 0, this._maxHP);
+		this.hp = this._maxHP;
 		this.mana = clamp( settings.Mana, 0, this._maxMana);
 		this.stamina = clamp( settings.Stamina, 0, this._maxStamina);
 		this.cloth = clamp( settings.Cloth, 0, 100);
@@ -382,7 +383,7 @@ $(document).ready(function () {
 		},
 		
 		getStatBlock : function () {
-			return this.name + " stats: Strength:" + this.strength() + " Dexterity:" + this.dexterity() + " Endurance:" + this.endurance() + " Intellect:" + this.intellect();
+			return this.name + " stats: Strength:" + this.strength() + " Dexterity:" + this.dexterity() + " Endurance:" + this.endurance() + " Intellect:" + this.intellect() + " Willpower:" + this.willpower();
 		},
 		
 		getStatus : function () {
