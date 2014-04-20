@@ -28,12 +28,20 @@ legend {
 }
 	
 .ErrorBox {
-	width: 40em;
+	width: 42em;
+	margin: 0em;
 	padding: 0.25em;
 	color: #d00;
 	text-align: center;
 }
-	
+
+.HoverBox {
+	width: 42em;
+	margin: 0em 0.7em;
+	padding: 0.25em;
+	text-align: center;
+}
+
 table.FrameTable {
 	padding: 0em;
 	margin: 0.5em;
@@ -71,6 +79,11 @@ td.FullHeightCell {
 	margin: 0em;
 	padding: 4px 0.125em;
 	text-align: center;
+}
+
+.RadioWide input[type=radio]:hover + label,
+.RadioList input[type=radio]:hover + label { 
+	background-color:#fff0b0;
 }
 
 .RadioWide input[type=radio]:checked + label,
