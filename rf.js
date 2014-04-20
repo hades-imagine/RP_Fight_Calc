@@ -251,7 +251,7 @@ $(document).ready(function () {
 		if (!(this instanceof fighter)) return new fighter(settings); //protection against calling this as a function rather than instantiating it with new.
 		var errors = [];
 		this.name = settings.Name;
-		
+	
 		//Check numeric fields for invalid values
 		var nonNumericFields = ["Name"];
 		$.each(settings, function(key, value) {			
@@ -264,7 +264,11 @@ $(document).ready(function () {
 		this._endurance = (+settings.Endurance);
 		this._intellect = (+settings.Intellect);
 		this._willpower = (+settings.Willpower);
-	
+
+		this._dizzyValue = 40 - this._intellect;
+		this._koValue = 25;
+		this._deathValue = 0;
+		
 		//Check stat points for conformity to rules
 		if (this._strength > 10  || this._strength < 1) errors.push( settings.Name + "'s Strength is outside the allowed range (1 to 10).");		
 		if (this._dexterity > 10 || this._dexterity < 1) errors.push( settings.Name + "'s Dexterity is outside the allowed range (1 to 10).");		
@@ -298,13 +302,12 @@ $(document).ready(function () {
 	};
 	
 	fighter.prototype = {
-		dizzyValue : 40,
-		koValue : 25,
-		deathValue : 0,
 		strength : function () { 
 			var total = this._strength;
 			total -= this.isDisoriented;
 			if (this.isRestrained) total = total / 2;
+			total = Math.max(total, 1);
+			total = Math.ceil(total);
 			return total;
 		},
 		
@@ -312,24 +315,32 @@ $(document).ready(function () {
 			var total = this._dexterity; 
 			total -= this.isDisoriented;
 			if (this.isRestrained) total = total / 2;
+			total = Math.max(total, 1);
+			total = Math.ceil(total);
 			return total;
 		},
 		
 		endurance : function () { 
 			var total = this._endurance;
 			total -= this.isDisoriented;
+			total = Math.max(total, 1);
+			total = Math.ceil(total);
 			return total;
 		},
 		
 		intellect : function () { 
 			var total = this._intellect;
 			total -= this.isDisoriented;
+			total = Math.max(total, 1);
+			total = Math.ceil(total);
 			return total;
 		},
 		
 		willpower : function () { 
 			var total = this._willpower;
 			total -= this.isDisoriented;
+			total = Math.max(total, 1);
+			total = Math.ceil(total);
 			return total;
 		},
 		
@@ -378,18 +389,21 @@ $(document).ready(function () {
 			return "[color=orange]" + this.name + "[/color][color=yellow] health: " + this.hp + "[/color][color=green] stamina: " + this.stamina + "[/color] mana: " + this.mana + "|" + this._maxMana + "[color=purple] cloth: " + this.cloth + "[/color]" 
 		},
 		
-		updateCondition : function () {			
-			if( this.hp <= this.dizzyValue && !(this.isDisoriented) ) {
+		updateCondition : function () {
+			if ( this.isGrappledBy.length != 0 && !(this.isRestrained) ) this.isRestrained = true;
+			if ( this.isGrappledBy.length == 0 && this.isRestrained ) this.isRestrained = false;
+			
+			if ( this.hp <= this._dizzyValue && !(this.isDisoriented) ) {
 				this.isDisoriented = 1;
 				windowController.addHit( this.name + " is permanently dizzy! Stats penalty!" );
 			}
 			
-			if( this.hp <= this.koValue && !(this.isUnconscious) ) {
+			if ( this.hp <= this._koValue && !(this.isUnconscious) ) {
 				this.isUnconscious = true;
 				windowController.addHit( this.name + " is permanently Knocked Out (or extremely dizzy, and can not resist)! Feel free to use this opportunity! " + this.name + " must not resist! Continue beating them to get a fatality suggestion." );
 			}
 			
-			if( this.hp <= this.deathValue && !(this.isDead) ) { 
+			if ( this.hp <= this._deathValue && !(this.isDead) ) { 
 				this.isDead = true;
 				windowController.addHit( this.name + " dies in the next move (or is already dead, as you wish to RP it). CLAIM YOUR SPOILS and VICTORY and FINISH YOUR OPPONENT!" );
 				windowController.addSpecial( "FATALITY SUGGESTION: " + this.pickFatality());
@@ -405,7 +419,7 @@ $(document).ready(function () {
 			
 			if (roll + attacker.dexterity() - target.dexterity() > difficulty)
 			{
-				damage = (roll / 2) + attacker.strength() - (target.endurance() / 2);
+				damage = (roll / 2) + attacker.strength();
 				if ( attacker.stamina < requiredStam )
 				{
 					damage = damage * (attacker.stamina / requiredStam);
@@ -436,11 +450,11 @@ $(document).ready(function () {
 			var target = battlefield.getTarget();
 			var damage = 0;
 			var requiredStam = 35;
-			var difficulty = 7;
+			var difficulty = 10;
 			
 			if (roll + attacker.dexterity() - target.dexterity() > difficulty)
 			{
-				damage = roll + (3 * attacker.strength()) - (2 * target.endurance());
+				damage = roll + (2 * attacker.strength());
 				if ( attacker.stamina < requiredStam )
 				{
 					damage = damage * (attacker.stamina / requiredStam);
@@ -481,7 +495,7 @@ $(document).ready(function () {
 					attacker.removeGrappler( target );
 					bonusStam = 5;
 				} else {
-					damage = ((roll / 2) + attacker.strength() - target.endurance()) / 2;
+					damage = ((roll / 2) + attacker.strength()) / 2;
 					manaDamage = (target.mana/2) + 3;
 					
 					if ( attacker.isGrappling( target ) ) { 
@@ -548,7 +562,7 @@ $(document).ready(function () {
 				windowController.addHit( " CRITICAL MISS! " );
 				windowController.addHint( "TIP: YOU NEED MORE STAMINA FOR TACKLE (40 at least)!" );
 			} else if (roll + attacker.strength() + attacker.dexterity() - (target.dexterity() * 2) > difficulty )	{
-				damage = (roll + attacker.strength() - target.endurance())/4;
+				damage = (roll + attacker.strength())/4;
 				
 				if( attacker.isGrappling( target ) ) { 
 					windowController.addHit( attacker.name + " THREW " + target.name + " on the ground! " + attacker.name + " can make another move in a row!" );
