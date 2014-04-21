@@ -33,10 +33,20 @@ legend {
 
 .ResultBox {
 	font-size: 85%;
+	width: 100%;
 	padding: 0em;
 	margin: 0.5em;
 }
-	
+
+.ThemedBox {
+	font-size: 85%;
+	width: 100%;
+	color: #fff;
+	background-color: #222;
+	padding: 0.5em;
+	margin: 0.5em;
+}
+
 .ErrorBox {
 	width: 42em;
 	margin: 0em;

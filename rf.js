@@ -371,7 +371,7 @@ $(document).ready(function () {
 			damage : function (message) {	return "[color=yellow]( Damage: " + message + " )[/color]"; },
 			hit : function (message) { return "[color=red][b]" + message + "[/b][/color]"; },
 			hint : function (message) { return "[color=purple]" + message + "[/color]"; },
-			special : function (message) { return "<br />[color=red]" + message + "[/color]"; }
+			special : function (message) { return "\n[color=red]" + message + "[/color]"; }
 		},
 		_windowPanels : $( ".InputPanel" ),
 		_activePanel : "",
@@ -467,15 +467,16 @@ $(document).ready(function () {
 			if( this.messages.damage != 0 ) lines[0] += this._formatMessage.damage( this.messages.damage );
 			if( lines[0] == "" ) lines = [];
 			
-			if( this.messages.hit.length ) lines.push( this._formatMessage.hit( this.messages.hit.join("<br />") ));
-			if( this.messages.status.length ) lines.push( this.messages.status.join("<br /> ") );
-			if( this.messages.hint.length ) lines.push( this._formatMessage.hint( this.messages.hint.join("<br />") ));			
-			if( this.messages.special.length ) lines.push( this._formatMessage.special( this.messages.special.join("<br />") ));
-			if( this.messages.info.length ) lines.push( "<br />" + this.messages.info.join("<br />") );
-			$( "#CombatResult" ).html( lines.join("<br />"));
+			if( this.messages.hit.length ) lines.push( this._formatMessage.hit( this.messages.hit.join("\n") ));
+			if( this.messages.status.length ) lines.push( this.messages.status.join("\n") );
+			if( this.messages.hint.length ) lines.push( this._formatMessage.hint( this.messages.hint.join("\n") ));			
+			if( this.messages.special.length ) lines.push( this._formatMessage.special( this.messages.special.join("\n") ));
+			if( this.messages.info.length ) lines.push( "\n" + this.messages.info.join("\n") );
+			$( "#CombatResult" ).html( lines.join("\n"));
 
 			var tagParser = new BBParser();
-			$( "#HoverTip" ).html( tagParser.parseContent( $( "#CombatResult" ).html() ));
+			// str = str.replace(/\n/g, '<br />');
+			$( "#ParsedOutput" ).html( tagParser.parseContent( $( "#CombatResult" ).html().replace(/\n/g, '<br />') ));
 			
 			$( "#ErrorMessage" ).empty();
 			if( this.messages.error.length ) $( "#ErrorMessage" ).append( this.messages.error.join("<br />") );		
