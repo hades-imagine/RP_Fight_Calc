@@ -1,3 +1,5 @@
+//BBParser shamelessly borrowed from the f-chat javascript. Feel free to skip on past this bit.
+
 BBParser = function () {
 	var a = {};
 	a._urlregex = /^\s*((?:https?|ftps?|irc):\/\/[^\s\/$.?#"'].[^\s]*)\s*$/;
@@ -296,10 +298,17 @@ BBParser = function () {
 	}
 };
 
+//----------------------------------------------------------------------------------
+// All the Rendezvous Fight specific code can be found below.
+//----------------------------------------------------------------------------------	
+
 $(document).ready(function () {
 	//----------------------------------------------------------------------------------
 	// Functions and classes
 	//----------------------------------------------------------------------------------	
+	
+	// Pass rollDice an array of integers, get back a result as if each of those numbers were a die with that many sides.
+	// For example, rollDice ( [6,6,6] ) would return the result of a 3d6 roll, and rollDice([20]) would return the result of a 1d20 roll.
 	function rollDice( dice ) {
 		var total = 0;
 		for (var i = 0, len = dice.length; i < len; i++) {
@@ -308,14 +317,18 @@ $(document).ready(function () {
 		return total;
 	};
 
+	// Pretty much what it says on the tin, returns 1 or 0 at random.
 	function coinflip() {
 		return Math.round(Math.random());
 	};
 
+	// Force a value (n) onto the range min to max. Careful to pass this function only actual numeric values, if n, min, or max cannot be converted into a number, you'll just get back NaN as the result.
+	// Probably ought to add some validation at some point to fix that.
 	function clamp (n, min, max) {
 		return Math.max(min, Math.min(n, max));
 	};
 
+	//windowController is a collection of functions and message strings used to control what is actually output to the page. It doesn't need to be instantiated, it's not a class... just a handy way of collecting related items and referencing things.	
 	var windowController = {
 		_rollovers : {
 			"Strength" : "Strength. <br /> This is your base damage stat; the higher this is, the higher your basic attacks will be. This affects all attacks besides ranged, and also increases your chance of performing techniques like grab or tackle.",
@@ -475,7 +488,6 @@ $(document).ready(function () {
 			$( "#CombatResult" ).html( lines.join("\n"));
 
 			var tagParser = new BBParser();
-			// str = str.replace(/\n/g, '<br />');
 			$( "#ParsedOutput" ).html( tagParser.parseContent( $( "#CombatResult" ).html().replace(/\n/g, '<br />') ));
 			
 			$( "#ErrorMessage" ).empty();
@@ -493,9 +505,11 @@ $(document).ready(function () {
 				error : []
 			}
 		},
+		
 		setActionButton : function ( name ) {
 			$("#Take_Action").val( "Take action as " + name );
 		},
+		
 		addAction : function( line ) { if( typeof line === "string" ) this.messages.action.push(line); },
 		addHit : function( line ) { if( typeof line === "string" ) this.messages.hit.push(line); },
 		addStatus : function( line ) { if( typeof line === "string" ) this.messages.status.push(line); },
@@ -510,14 +524,16 @@ $(document).ready(function () {
 			$(target).siblings("input[name=HP]").val(hp);
 			$(target).siblings("span[name=maxHP]").html(hp);
 		},
+		
 		calcFormMana : function ( target ) {
 			var mana = 0;
 			if( parseInt(target.value) == target.value ) mana = (target.value * 10);
 			$(target).siblings("input[name=Mana]").val(mana);
 			$(target).siblings("span[name=maxMana]").html(mana);
-		},
+		}
 	};
 	
+	// Arena : The Arena class determines the stage, stores the global settings like gameSpeed, collects the fighters involved in a combat, and tracks things like which fighter's turn it currently is.
 	function arena(){
 		if (!(this instanceof arena)) return new arena(); //protection against calling this as a function rather than instantiating it with new.
 		this._fighters = [];	
@@ -615,6 +631,8 @@ $(document).ready(function () {
 		}
 	};
 
+	// Fighter : The fighter class stores the information specific to each fighter (name, hit points, etc.), and provides functions for handling attacks and effects like the end of turn regeneration/upkeep.
+	// The fighter class also provides accessors for the character attributes and damage functions, so that it's easier to implement/change things like the game speed setting, or the effects of being stunned.
 	function fighter(settings, globalSettings){
 		if (!(this instanceof fighter)) return new fighter(settings); //protection against calling this as a function rather than instantiating it with new.
 		var errors = [];
@@ -1095,8 +1113,8 @@ $(document).ready(function () {
 	// One time events (Setting the default visibility of panels, for example)
 	// Objects and variables not tied to a particular event
 	//----------------------------------------------------------------------------------
-	windowController.switchToPanel("Setup");
-	var battlefield = new arena();
+	windowController.switchToPanel("Setup");	//Currently we start out on the form used to setup a fight, need to add an instructions panel at some point before v1.0
+	var battlefield = new arena(); //Create an arena named battlefield. It's important that this object is *outside* of the scope of any particular event function so that all event functions may access it.
 
 	//----------------------------------------------------------------------------------
 	// Event Handlers
@@ -1122,14 +1140,15 @@ $(document).ready(function () {
 	// Take input from the setup form, add fighters to the arena, and then switch to the next panel.
 	$( "#InitialSetup" ).submit( function( event ) {
 		event.preventDefault();	
-		
+
+		// Get the global settings from the fieldset Arena
 		var arenaSettings = {};
 		$( "fieldset[id='Arena']" ).find("input").each(function() {
 			arenaSettings[this.name] = $(this).val();
 		});
 		battlefield.setGlobalFighterSettings(arenaSettings);
-//		console.dir( arenaSettings );
 		
+		// Clear the list of Fighters (just in case) and then get each fighters settings from the FighterN fieldsets. Any number of fighters could potentially be added, but currently the UI is only set up to allow two.
 		battlefield.clearFighters();
 		var fighterSettings = [ ];
 		
@@ -1141,21 +1160,24 @@ $(document).ready(function () {
 			fighterSettings.push( settings )
 		});
 		
+		// Check and make sure there weren't any problems with the fighter settings that might have thrown an error.
 		var fightersAdded = 0;
 		for (var i = 0, len = fighterSettings.length; i < len; i++) {
 			fightersAdded += battlefield.addFighter(fighterSettings[i]);
 		};
 		
+		// And move on to the gameplay screen if there weren't errors.
 		if( fightersAdded == fighterSettings.length ) {
 			battlefield.pickInitialActor();
 			windowController.nextPanel();
 			windowController.addHit("Game started!");
 			windowController.addHit("FIGHTING STAGE: " + battlefield.stage + " - " + battlefield.getActor().name + " goes first!");
-			battlefield.outputFighterStatus();
-			battlefield.outputFighterStats();
+			battlefield.outputFighterStatus(); // Creates the fighter status blocks (HP/Mana/Stamina/Cloth)
+			battlefield.outputFighterStats(); // Creates the fighter stat blocks (STR/DEX/END/INT/WIL)
 			windowController.addInfo( "[url=http://www.f-list.net/c/rendezvous%20fight/]Visit this page for stage descriptions[/url]" );
 		} 	
 		
+		// Either way, update the output (which will display errors if there were any and post the battle start text to the gameplay screen).
 		windowController.updateOutput();
 	});
 
@@ -1169,6 +1191,7 @@ $(document).ready(function () {
 		
 		windowController.addAction(action);
 
+		// Fumble on a bad roll, act on a good roll. Each attack deteremines its own method of resolving hits vs. misses.
 		if (roll > 2) {
 			actor["action" + action]( roll );
 		} else {
@@ -1178,9 +1201,9 @@ $(document).ready(function () {
 		
 		windowController.addInfo("Raw Dice Roll: " + roll);
 		
-		battlefield.turnUpkeep();
-		battlefield.outputFighterStatus();
+		battlefield.turnUpkeep(); //End of turn upkeep (Stamina regen, check for being stunned/knocked out, etc.)
+		battlefield.outputFighterStatus(); // Creates the fighter status blocks (HP/Mana/Stamina/Cloth)
 		//battlefield.outputFighterStats();			
-		windowController.updateOutput();
+		windowController.updateOutput(); //Tells the window controller to format and dump all the queued up messages to the results screen.
 	});
 });
