@@ -11,18 +11,28 @@ legend {
 	width: 100%;
 }
 	
-.StatBlock label {
+.StatBlock > label {
 	display:inline-block;
-	width: 5em;		
+	width: 6em;		
 }
 
 .FormContainer {
-	display:inline-block;
+	display: inline-block;
 	border: none;
 	width: 20em;
 }
-	
+
+.WideFormContainer {
+	border: none;
+	width: 100%;
+}
+
+.WideFormContainer td {
+	text-align: center;
+}
+
 .ResultBox {
+	font-size: 85%;
 	padding: 0em;
 	margin: 0.5em;
 }
@@ -39,10 +49,10 @@ legend {
 	width: 42em;
 	margin: 0em 0.7em;
 	padding: 0.25em;
-	text-align: center;
+	text-align: left;
 }
 
-table.FrameTable {
+.table.FrameTable {
 	padding: 0em;
 	margin: 0.5em;
 }
@@ -89,4 +99,51 @@ td.FullHeightCell {
 .RadioWide input[type=radio]:checked + label,
 .RadioList input[type=radio]:checked + label { 
 	background-color:#f0e0a0;
+}
+
+/* F-List BBCode text colors */
+.bluefont, .bluefont a {
+color:#1E90FF !important;
+}
+.whitefont, .whitefont a {
+color:white !important;
+}
+.blackfont, .blackfont a{
+color:black !important;
+}
+.redfont , .redfont a {
+color:#f44 !important;
+text-shadow:#000 0px 1px 2px;
+}
+.yellowfont, .yellowfont a{
+color:yellow !important;
+text-shadow:#000 0px 1px 2px;
+}
+.greenfont, .greenfont a{
+color:#4f4 !important;
+text-shadow:#000 0px 1px 2px;
+}
+.pinkfont, .pinkfont a{
+color:#FFCBDB !important;
+text-shadow:#000 0px 1px 2px;
+}
+.grayfont, .grayfont a{
+color:#D3D3D3 !important;
+text-shadow:#000 0px 1px 2px;
+}
+.orangefont, .orangefont a{
+color:orange !important;
+text-shadow:#000 0px 1px 2px;
+}
+.purplefont, .purplefont a{
+color:#DD00FF !important;
+text-shadow:#000 0px 1px 2px;
+}
+.brownfont, .brownfont a{
+color:#967117 !important;
+text-shadow:#000 0px 1px 2px;
+}
+.cyanfont, .cyanfont a{
+color:#00FFFF !important;
+text-shadow:#000 0px 1px 2px;
 }
