@@ -474,8 +474,8 @@ $(document).ready(function () {
 			if( this.messages.info.length ) lines.push( "<br />" + this.messages.info.join("<br />") );
 			$( "#CombatResult" ).html( lines.join("<br />"));
 
-			//var tagParser = new BBParser();
-			//$( "#ParsedOutput" ).html( tagParser.parseContent( $( "#CombatResult" ).html() ));
+			var tagParser = new BBParser();
+			$( "#HoverTip" ).html( tagParser.parseContent( $( "#CombatResult" ).html() ));
 			
 			$( "#ErrorMessage" ).empty();
 			if( this.messages.error.length ) $( "#ErrorMessage" ).append( this.messages.error.join("<br />") );		
