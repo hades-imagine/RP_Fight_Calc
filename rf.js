@@ -52,7 +52,7 @@ $(document).ready(function () {
 			"Rip" : "Rip/Damage Clothes (Free) <br />Does no HP damage, damaging clothes instead. Much greater effect when used in a grab. 1 piece of clothing equals 20 points. Keep that in mind. If you only have bikini on you, it is 40 points, for 2 pieces. You can use this stat anyway you like as well.",
 			"Tackle" : "Tackle or Throw (40 Stamina, 20 if successful.) <br />Deals stamina damage and stuns the opponent, preventing them from taking their next action. (Effectively letting you perform another action). Tackle during Grab releases opponent. <br /> Strength and Dexterity affects chance to hit. <br />Dexterity greatly affects defense.  <br />Reduced stamina cost if successful.",
 			"Magic" : "Magic attack (30 Mana) <br /> Blasts, bombs, and magical might. Attack your opponents from range, if you have the reservesIntelligence greatly affects damage.",
-			"Ranged" : "Ranged attack (15 Mana) <br /> Small arms, bows and throwing knives, and minor innate magical powers (eye beams, frost breath and such). Ranged attacks are stamina efficient, and deal moderate damage based on either Dexterity or Intelligence (whichever is higher), but are only so-so in terms of accuracy unless you take the time to Aim/Focus first.",
+			"Ranged" : "Ranged attack (15 Stamina) <br /> Small arms, bows and throwing knives, and minor innate magical powers (eye beams, frost breath and such). Ranged attacks are stamina efficient, and deal moderate damage based on either Dexterity or Intelligence (whichever is higher), but are only so-so in terms of accuracy unless you take the time to Aim/Focus first.",
 			"Rest" : "Rest (Free) <br />Restores stamina. <br /> Endurance affects stamina regained. <br />Wisdom affects the likelihood of successfully resting in stressful conditions.",
 			"Channel" : "Channel (Free) <br />Restores mana at the cost of stamina. <br /> Willpower affects the amount of stamina converted into mana, and affects the likelihood of successfully channeling in stressful conditions.",
 			"Focus" : "Focus/Aim (Free) <br />Increases accuracy. <br /> Willpower affects how much damage you may take before your focus/aim is lost, and affects the likelihood of successfully focusing/aiming in stressful conditions.",
@@ -888,7 +888,7 @@ $(document).ready(function () {
 		actionRanged : function ( roll ) {
 			var attacker = this;
 			var target = battlefield.getTarget();
-			var baseDamage = roll /2;
+			var baseDamage = roll;
 			var damage = Math.max(attacker.dexterity(), attacker.intellect());
 			var requiredStam = 15; 
 			var difficulty = 5; //Base difficulty, rolls greater than this amount will hit.
@@ -945,14 +945,14 @@ $(document).ready(function () {
 			var baseDamage = roll/2 + attacker.intellect();
 			var damage = 2 * attacker.intellect();
 			var requiredMana = 30;
-			var difficulty = 8; //Base difficulty, rolls greater than this amount will hit.
+			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
 		
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if the attacker is restrained.
 			
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 2; //Lower the difficulty slightly if the target is restrained.
-			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
+			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused
 			
 			if ( attacker.mana < requiredMana ) {	//Not enough mana-- reduced effect
 				damage *= attacker.mana / requiredMana;
@@ -1057,7 +1057,7 @@ $(document).ready(function () {
 				return 0; //Failed action, if we ever need to check that.
 			}
 			
-			var manaShift =  roll + (attacker.willpower() * 3);
+			var manaShift =  18 + roll + (attacker.willpower() * 3);
 			manaShift = Math.min( manaShift, attacker.stamina);
 			manaShift = Math.min( manaShift, attacker._maxMana - attacker.mana);
 			

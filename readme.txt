@@ -1,3 +1,11 @@
+v.0.9.3.3 hotfix (April 23rd, 2014):
+-- Bug Fixes:
+ - The tooltip for ranged attacks has been changed to properly reflect the fact that they cost *stamina*, not mana.
+
+-- Changes to existing mechanics:
+ - Channel is now considerably more effective at converting stamina into mana. Mages shoud no longer have to channel quite as often.
+ - Ranged attacks deal slightly more damage.
+
 v.0.9.3.2 hotfix (April 23rd, 2014):
 -- Bug fixes:
  - Initial hp and mana should immediately recalculate when the page is refreshed now, instead of staying at the default values until either endurance or willpower is changed.
