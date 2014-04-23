@@ -374,7 +374,7 @@ $(document).ready(function () {
 		}
 		
 		this._maxHP = 60 + this._endurance * 10;
-		this._maxMana = this._intellect * 10;
+		this._maxMana = this._willpower * 10;
 		this._maxStamina = 100;
 	
 		this._damageEffectMult = globalSettings.GameSpeed;
@@ -537,19 +537,23 @@ $(document).ready(function () {
 		},
 		
 		getStatus : function () {
-			return "[color=orange]" + this.name + "[/color][color=yellow] health: " + this.hp + "[/color][color=green] stamina: " + this.stamina + "[/color] mana: " + this.mana + "|" + this._maxMana + "[color=purple] cloth: " + this.cloth + "[/color]" 
+			var message = "[color=orange]" + this.name + "[/color][color=yellow] health: " + this.hp + "[/color][color=green] stamina: " + this.stamina + "[/color] mana: " + this.mana + "|" + this._maxMana + "[color=purple] cloth: " + this.cloth + "[/color]"; 
+			if( this.isRestrained ) windowController.addHint( this.name + " is Grappled." );
+			if( this.isFocused ) windowController.addHint( this.name + " is Aiming/Focused." );
+			if( !this.isInMelee ) windowController.addHint( this.name + " is too far away to melee." );
+			return message;
 		},
 		
 		updateCondition : function () {
 			if ( this.isGrappledBy.length != 0 && !(this.isRestrained) ) this.isRestrained = true;
 			if ( this.isGrappledBy.length == 0 && this.isRestrained ) this.isRestrained = false;
 			
-			if ( this.hp <= Math.min(this._dizzyValue - (this.willpower() * 2), 0) && !(this.isDisoriented) ) {
+			if ( this.hp <= Math.max(this._dizzyValue - (this.willpower() * 2), 0) && !(this.isDisoriented) ) {
 				this.isDisoriented = 1;
 				windowController.addHit( this.name + " is permanently dizzy! Stats penalty!" );
 			}
 			
-			if ( this.hp <= Math.min(this._koValue - (this.willpower() * 2), 0) && !(this.isUnconscious) ) {
+			if ( this.hp <= Math.max(this._koValue - (this.willpower() * 2), 0) && !(this.isUnconscious) ) {
 				this.isUnconscious = true;
 				windowController.addHit( this.name + " is permanently Knocked Out (or extremely dizzy, and can not resist)! Feel free to use this opportunity! " + this.name + " must not resist! Continue beating them to get a fatality suggestion." );
 			}
@@ -1164,7 +1168,7 @@ $(document).ready(function () {
 			windowController.calcFormHP( this );
 		});
 		
-		$(this).find("input[name=Intellect]").change( function( event ) {
+		$(this).find("input[name=Willpower]").change( function( event ) {
 			windowController.calcFormMana( this );
 		});
 	});
