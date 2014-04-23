@@ -1,3 +1,22 @@
+v.0.9.3.2 hotfix (April 23rd, 2014):
+-- Bug fixes:
+ - Initial hp and mana should immediately recalculate when the page is refreshed now, instead of staying at the default values until either endurance or willpower is changed.
+ - Fixed bbCode output no longer updating properly in some circumstances (hopefully).
+ - Fixed a bug where Escape followed by Pursuit was leaving one combatant in melee and one not in melee.
+ - Altered the attack formula to make things more intuitive (higher rolls will crit now, lower rolls will allow the target to dodge, instead of having two separate rolls... one of which was hidden.)
+ - Altered the damage formula slightly on most attacks so that criticals wouldn't take the base roll into account when adding bonus damage (since criticals will now only happen on high rolls, that would have increased the average damage of criticals quite a bit). To compensate, Dexterity now slightly increases your odds of hitting (on par with the effects of dodge, but in reverse).
+ - Clarified lots of attack messages so that it should be more obvious what is causing things to happen.
+ - Fixed a couple places where the attacker's name and target's name were reversed in attack messages.
+
+-- Changes to existing mechanics:
+ - Aim/Focus now has a chance of breaking if your stamina gets too low, and will definitely break if your stamina falls to 0 at any point.
+
+v.0.9.3.1 hotfix (April 22nd, 2014):
+-- Bug fixes:
+ - Mana is properly calculated form Willpower now, not Intellect.
+ - Dizzy and KO'd are firing properly. (Doh! Used Math.min instead of Math.max to test something...)
+ - More helpful status messages for grappled, aiming, etc.
+
 v.0.9.3 (April 22nd, 2014):
 -- Bug fixes:
  - Some moves were inadvertently dealing damage or having some effects even when they missed. This has been fixed.
