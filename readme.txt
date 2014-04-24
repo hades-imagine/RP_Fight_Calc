@@ -1,3 +1,30 @@
+-- Questions concerning the current development:
+
+ - Should submission moves and Grappling crits do something more than just extra damage? Possibly a dizzy/disorientation effect?
+
+ - Should the maximum mana and stamina be higher than the starting values? (allowing even low willpower characters to potentially use a magic attack occasionally, for example). Possibly with no actual maximum, just a decay over time when you've gone above your normal maximum?
+
+ - Is the cost of heavy attacks too high, considering their accuracy? How about Magic attacks?
+
+ - For non casters, Intellect doesn't do terribly much at the moment... Any suggestions regarding additional effects Intellect might have? (Resisting goads and disorienting blows and such, or buffing defensive moves possibly?)
+
+-- Possible future development:
+
+ - An undo button is coming at some point, maybe. The hard part is making sure there's no way to abuse it. Possibly tie the results of each round a particular seed generated as the battle begins, so that undoing and redoing a turn will have the same results each time?
+
+ - New moves? Guard/Defend, Distract, Goad, Riposte, Counter, etc. If you see something you'd like to be able to do, but don't have an option for under the current rules... let me know. 
+
+ - Critical hits, Dodges, and other similar effects could potentially open up the possibility of follow-up attacks (Counters and the like) that can only be used after a successful dodge or critical, but have greatly increased effects.
+
+ - Stage specific hazards/bonuses?
+
+
+-----------  Patch Notes  -----------------
+v.0.9.3.4 hotfix (April 23rd, 2014):
+-- Changes to existing mechanics:
+ - It is no longer possible to crit when you try and use a move you do not have sufficient stamina or mana to use at full capacity.
+
+
 v.0.9.3.3 hotfix (April 23rd, 2014):
 -- Bug Fixes:
  - The tooltip for ranged attacks has been changed to properly reflect the fact that they cost *stamina*, not mana.
@@ -71,18 +98,3 @@ v.0.9.3 (April 22nd, 2014):
  - Escape/Pursue: Run has been replaced by Escape/Pursue, which does the following. If you are being grappled, Escape/Pursue will let you attempt to break free. When you are not grappling, escape will open up some distance between you and your opponent, forcing them to pursue you or try to tackle you if they want to use melee attacks. When your opponent is at a distance, Escape/Pursue will let you pursue them, trying to force them back into melee.
 
  - Ranged Attacks: A new type of attack has been added, the Ranged attack. This attack is stamina efficient, and deals moderate damage based on either Dexterity or Intelligence (whichever is higher), but is only so-so in terms of accuracy unless you take the time to Aim/Focus first.
-
--- In development/discussion:
- - An undo button is coming in the next patch, possibly. The hard part is making sure there's no way to abuse it. Possibly tie the results of each round a particular seed generated as the battle begins, so that undoing and redoing a turn will have the same results each time?
-
- - Critical hits, Dodges, and other similar effects could potentially open up the possibility of follow-up attacks (Counters and the like) that can only be used after a successful dodge or critical, but have greatly increased effects.
-
- - Willpower, does it need an additional bump in effectiveness? Possibly adding a resistance to the effects of some attacks, like submission holds?
-
- - Should the maximum mana and stamina be higher than the starting values? (allowing even low willpower characters to potentially use a magic attack occasionally, for example). Possibly with no actual maximum, just a decay over time when you've gone above your normal maximum?
-
- - New moves? Guard/Defend, Distract, Goad, Riposte, Counter, etc. If you see something you'd like to be able to do, but don't have an option for under the current rules... let me know.
-
- - Is the cost of heavy attacks too high, considering their accuracy? How about Magic attacks?
-
- - For non casters, Intellect doesn't do terribly much at the moment... I'd like to add some additional effects it might have (resisting goads and disorienting blows and such, or buffing defensive moves possibly?)

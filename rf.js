@@ -537,30 +537,30 @@ $(document).ready(function () {
 		},
 		
 		updateCondition : function () {
-			if ( this.isGrappledBy.length != 0 && !(this.isRestrained) ) this.isRestrained = true;
-			if ( this.isGrappledBy.length == 0 && this.isRestrained ) this.isRestrained = false;
+			if ( this.isGrappledBy.length != 0 && this.isRestrained == false ) this.isRestrained = true;
+			if ( this.isGrappledBy.length == 0 && this.isRestrained == true) this.isRestrained = false;
 			
-			if ( this.stamina < rollDice([20]) && this.isFocused ) {
+			if ( this.stamina < rollDice([20]) && this.isFocused > 0) {
 				windowController.addHint( this.name + " lost their focus/aim because of fatigue!" );
 				this.isFocused = 0;
 			}
 			
-			if ( this.hp > Math.max(this._dizzyValue - (this.willpower() * 2), 0) && this.isDisoriented ) {
+			if ( this.hp > Math.max(this._dizzyValue - (this.willpower() * 2), 0) && this.isDisoriented > 0) {
 				this.isDisoriented -= 1;
 				if(!this.isDisoriented) windowController.addHint( this.name + " has recovered and is no longer disoriented!" );
 			}
 			
-			if ( this.hp <= Math.max(this._dizzyValue - (this.willpower() * 2), 0) && !(this.isDisoriented) ) {
+			if ( this.hp <= Math.max(this._dizzyValue - (this.willpower() * 2), 0) && this.isDisoriented == 0 ) {
 				this.isDisoriented = 1;
 				windowController.addHit( this.name + " is dizzy! Stats penalty!" );
 			}
 			
-			if ( this.hp <= Math.max(this._koValue - (this.willpower() * 2), 0) && !(this.isUnconscious) ) {
+			if ( this.hp <= Math.max(this._koValue - (this.willpower() * 2), 0) && this.isUnconscious == false ) {
 				this.isUnconscious = true;
 				windowController.addHit( this.name + " is permanently Knocked Out (or extremely dizzy, and can not resist)! Feel free to use this opportunity! " + this.name + " must not resist! Continue beating them to get a fatality suggestion." );
 			}
 			
-			if ( this.hp <= this._deathValue && !(this.isDead) ) { 
+			if ( this.hp <= this._deathValue && this.isDead == false ) { 
 				this.isDead = true;
 				windowController.addHit( this.name + " dies in the next move (or is already dead, as you wish to RP it). CLAIM YOUR SPOILS and VICTORY and FINISH YOUR OPPONENT!" );
 				windowController.addSpecial( "FATALITY SUGGESTION: " + this.pickFatality());
@@ -579,7 +579,7 @@ $(document).ready(function () {
 			}
 			
 			attackTable.dodge = attackTable.miss + Math.ceil(targetDex * rangeMult);
-			attackTable.glancing = attackTable.miss + Math.floor(targetDex * 3 * rangeMult);
+			attackTable.glancing = attackTable.dodge + Math.floor( ((targetDex * 2) - attackerDex) * rangeMult);
 			attackTable.crit = 21 - Math.ceil(attackerDex * rangeMult);
 			return attackTable;
 		},
@@ -612,7 +612,7 @@ $(document).ready(function () {
 			}
 			
 			var attackTable = attacker.buildActionTable( difficulty, target.dexterity(), attacker.dexterity(), attacker.dexterity() );
-			
+
 			if ( roll <= attackTable.miss ) {	//Miss-- no effect.
 				windowController.addHit( " MISS! " );
 				return 0; //Failed attack, if we ever need to check that.
@@ -662,7 +662,10 @@ $(document).ready(function () {
 			if (target.isRestrained) difficulty -= 3; //Lower it if the target is restrained.
 			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused
 			
+			var critCheck = true;
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
+				critCheck = false;
+				baseDamage *= attacker.stamina / requiredStam;
 				damage *= attacker.stamina / requiredStam;
 				difficulty += 4; // Too tired? You're likely to miss.
 				windowController.addHint( attacker.name + " did not have enough stamina, and took penalties to the attack." );
@@ -691,7 +694,7 @@ $(document).ready(function () {
 				windowController.addHit( " GLANCING HIT! " );
 				windowController.addHint( target.name + " avoided taking full damage. " );
 				damage /= 2;
-			} else if ( roll >= attackTable.crit ) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
+			} else if ( roll >= attackTable.crit && critCheck == true) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
 				windowController.addHit( " CRITICAL HIT! " );
 				windowController.addHint( attacker.name + " landed a particularly vicious blow!" );
 				damage *= 2; //Even at just x2 damage, a critical heavy is a game changer. 
@@ -719,8 +722,11 @@ $(document).ready(function () {
 			if (attacker.isRestrained) difficulty += 2; //Up the difficulty slightly if the attacker is restrained.			
 			if (target.isDisoriented) difficulty -= 2; //Lower the difficulty if the target is dizzy.
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
-			
+
+			var critCheck = true;
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
+				critCheck = false;
+				baseDamage *= attacker.stamina / requiredStam;
 				damage *= attacker.stamina / requiredStam;
 				difficulty += 4; // Too tired? You're likely to miss.
 				windowController.addHint( attacker.name + " did not have enough stamina, and took penalties to the attack." );
@@ -751,7 +757,7 @@ $(document).ready(function () {
 			if ( roll <= attackTable.glancing ) { //Glancing blow-- reduced damage/effect, typically half normal.
 				windowController.addHint( target.name + " put up quite a struggle, costing " + attacker.name + " additional stamina. ");
 				attacker.hitStamina (10 + target.strength());
-			} else if ( roll >= attackTable.crit ) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
+			} else if ( roll >= attackTable.crit && critCheck) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
 				windowController.addHint( "Critical! " + attacker.name + " found a particularly damaging hold!" );
 				damage *= 2; 
 			}
@@ -815,8 +821,12 @@ $(document).ready(function () {
 			if (target.isRestrained) difficulty -= 4; //Lower the difficulty if the target is restrained.
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
 
-			if (!target.isInMelee) requiredStam += 20; //Increase the stamina cost if the target is not in melee						
+			if (!target.isInMelee) requiredStam += 20; //Increase the stamina cost if the target is not in melee
+
+			var critCheck = true;
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
+				critCheck = false;
+				baseDamage *= attacker.stamina / requiredStam;
 				damage *= attacker.stamina / requiredStam;
 				stamDamage *= attacker.stamina / requiredStam;
 				difficulty += 4; // Too tired? You're likely to miss.
@@ -843,7 +853,7 @@ $(document).ready(function () {
 			if ( roll <= attackTable.glancing ) { //Glancing blow-- reduced damage/effect, typically half normal.
 				windowController.addHint( target.name + " rolled with the blow. They are still stunned, but lost less stamina. " );
 				stamDamage -= 20;
-			} else if ( roll >= attackTable.crit ) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
+			} else if ( roll >= attackTable.crit && critCheck == true) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
 				windowController.addHint( "Critical Hit! " + attacker.name + " really drove that one home!" );				
 				damage *= 2;
 				stamDamage *= 1.5;
@@ -898,8 +908,11 @@ $(document).ready(function () {
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 2; //Lower the difficulty slightly if the target is restrained.
 			if (attacker.isFocused) difficulty -= 5; //Lower the difficulty considerably if the attacker is focused
-			
+
+			var critCheck = true;
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
+				critCheck = false;
+				baseDamage *= attacker.stamina / requiredStam;
 				damage *= attacker.stamina / requiredStam;
 				difficulty += 4; // Too tired? You're likely to miss.
 				windowController.addHint( attacker.name + " did not have enough stamina, and took penalties to the attack." );			
@@ -923,7 +936,7 @@ $(document).ready(function () {
 				windowController.addHit( " GLANCING HIT! " );
 				windowController.addHint( target.name + " only took a flesh wound. " );
 				damage /= 2;
-			} else if ( roll >= attackTable.crit ) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
+			} else if ( roll >= attackTable.crit && critCheck == true) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
 				windowController.addHit( " CRITICAL HIT! " );
 				windowController.addHint( attacker.name + " hit somewhere that really hurts!" );
 				damage *= 3;				
@@ -953,8 +966,11 @@ $(document).ready(function () {
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 2; //Lower the difficulty slightly if the target is restrained.
 			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused
-			
+	
+			var critCheck = true;
 			if ( attacker.mana < requiredMana ) {	//Not enough mana-- reduced effect
+				critCheck = false;
+				baseDamage *= attacker.mana / requiredMana;
 				damage *= attacker.mana / requiredMana;
 				difficulty += 4; // Too tired? You're likely to have your spell fizzle.
 				windowController.addHint( attacker.name + " did not have enough mana, and took penalties to the attack." );			
@@ -1179,7 +1195,7 @@ $(document).ready(function () {
 	// One time events (Setting the default visibility of panels, for example)
 	// Objects and variables not tied to a particular event
 	//----------------------------------------------------------------------------------
-	windowController.switchToPanel("Setup");	//Currently we start out on the form used to setup a fight, need to add an instructions panel at some point before v1.0
+	windowController.switchToPanel("Setup"); //Currently we start out on the form used to setup a fight, need to add an instructions panel at some point before v1.0
 	var battlefield = new arena(); //Create an arena named battlefield. It's important that this object is *outside* of the scope of any particular event function so that all event functions may access it.
 
 	//----------------------------------------------------------------------------------
