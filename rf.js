@@ -319,9 +319,9 @@ $(document).ready(function () {
 		turnUpkeep : function () {
 			for (var i = 0, len = this._fighters.length; i < len; i++) {
 				this._fighters[i].updateCondition();
-				this._fighters[i].regen();
 			}
 
+			this._fighters[this._currentFighter].regen();
 			this.nextFighter();
 		}
 	};
@@ -527,8 +527,11 @@ $(document).ready(function () {
 			if( this._manaCap == this._maxMana ) this.manaBurn = 0;			
 			
 			if( this.isUnconscious == false ) {
-				this.addMana(1 + (this.willpower() / 2));
-				this.addStamina(1 + (this.endurance() / 2));
+				var stamBonus = 2 + this.willpower();
+				var manaBonus = 2 + this.willpower();
+				this.addStamina(stamBonus);
+				this.addMana(manaBonus);
+				windowController.addHint( this.name + " recovered " + stamBonus + " stamina and " + manaBonus + " mana!"  );
 			} else {
 				this.isStunned = true;
 			}			
@@ -541,7 +544,7 @@ $(document).ready(function () {
 		getStatus : function () {
 			var message = "[color=orange]" + this.name + "[/color][color=yellow] health: " + this.hp + "[/color][color=green] stamina: " + this.stamina + "[/color] mana: " + this.mana + "|" + this._maxMana + "[color=purple] cloth: " + this.cloth + "[/color]"; 
 			if( this.isRestrained ) windowController.addHint( this.name + " is Grappled." );
-			if( this.isFocused ) windowController.addHint( this.name + " is Aiming/Focused." );
+			if( this.isFocused ) windowController.addHint( this.name + " is Aimed/Focused." );
 			if( !this.isInMelee ) windowController.addHint( this.name + " is too far away to melee." );
 			return message;
 		},
@@ -1046,7 +1049,7 @@ $(document).ready(function () {
 			attacker.addHp(hpBonus);
 			attacker.addMana(manaBonus);
 			windowController.addHit( attacker.name + " SKIPS MOVE, RESTING!" );
-			windowController.addHint( attacker.name + " recovered " + stamBonus + " Stamina, " + hpBonus + " health, and " + manaBonus + " mana!"  );
+			windowController.addHint( attacker.name + " recovered " + stamBonus + " stamina, " + hpBonus + " health, and " + manaBonus + " mana!"  );
 			return 1;
 		},
 
@@ -1095,7 +1098,7 @@ $(document).ready(function () {
 			attacker.hitStamina(manaShift);
 			attacker.addMana(manaShift);
 			windowController.addHit( attacker.name + " CHANNELS STAMINA INTO MANA!" );
-			windowController.addHint( attacker.name + " recovered " + manaShift + " Mana, and will briefly be able to hold on to more mana than usual!" );
+			windowController.addHint( attacker.name + " recovered " + manaShift + " mana, and will briefly be able to hold on to more mana than usual!" );
 			return 1;
 		},
 		
@@ -1187,7 +1190,7 @@ $(document).ready(function () {
 				attacker.hitMana(15);
 				break;
 			case "Escape":
-				attacker.hitMana(10);
+				attacker.hitStamina(10);
 				break;
 			case "Skip/Rest":
 				windowController.addHint( attacker.name + " could not calm their nerves." );
@@ -1270,6 +1273,7 @@ $(document).ready(function () {
 			battlefield.outputFighterStatus(); // Creates the fighter status blocks (HP/Mana/Stamina/Cloth)
 			battlefield.outputFighterStats(); // Creates the fighter stat blocks (STR/DEX/END/INT/WIL)
 			windowController.addInfo( "[url=http://www.f-list.net/c/rendezvous%20fight/]Visit this page for stage descriptions[/url]" );
+			windowController.addInfo( "[url=https://github.com/Barrodin/RF_Fight_Test/]Visit this page for patch notes[/url]" );
 		} 	
 		
 		// Either way, update the output (which will display errors if there were any and post the battle start text to the gameplay screen).

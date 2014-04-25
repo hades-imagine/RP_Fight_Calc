@@ -16,6 +16,13 @@
 
 
 -----------  Patch Notes  -----------------
+v.0.9.4.2 Hotfix (April 25th, 2014):
+-- Bug Fixes:
+ - Fumbling when attempting to Escape was inadvertenly costing mana, not stamina. This has been corrected.
+ - Stamina/Mana regen were breaking in some situations because the addMana and addStamina function were expecting integers, not float, and I forgot to round a couple values off. This has been corrected.
+ - While I was at it, you now only regen on YOUR turn, but regen twice as much. The total amounts regenerated remain unchanged, but should be more obvious.
+ - There is now a message showing how much each fighter regenerated on their turn.
+
 v.0.9.4.1 Hotfix (April 24th, 2014):
 -- Bug Fixes:
  - The bonus HP and Mana from rest are now ACTUALLY being applied to the appropriate totals.
