@@ -2,10 +2,6 @@
 
  - Should submission moves and Grappling crits do something more than just extra damage? Possibly a dizzy/disorientation effect?
 
- - Should the maximum mana and stamina be higher than the starting values? (allowing even low willpower characters to potentially use a magic attack occasionally, for example). Possibly with no actual maximum, just a decay over time when you've gone above your normal maximum?
-
- - Is the cost of heavy attacks too high, considering their accuracy? How about Magic attacks?
-
  - For non casters, Intellect doesn't do terribly much at the moment... Any suggestions regarding additional effects Intellect might have? (Resisting goads and disorienting blows and such, or buffing defensive moves possibly?)
 
 -- Possible future development:
@@ -20,6 +16,12 @@
 
 
 -----------  Patch Notes  -----------------
+v.0.9.4 (April 24th, 2014):
+-- Changes to existing mechanics:
+ - The base stamina/mana regen have increased slightly. At 1 Endurance/Willpower, fighters should now regen 4 points per turn, and at 10 they should regen 8.
+ - Rest once again restores a moderate amount of HP and Mana.
+ - The mana gained from channel can now exceed your maximum normal mana, but mana beyond the normal cap will decay over time.
+
 v.0.9.3.4 hotfix (April 23rd, 2014):
 -- Changes to existing mechanics:
  - It is no longer possible to crit when you try and use a move you do not have sufficient stamina or mana to use at full capacity.

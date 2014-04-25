@@ -346,8 +346,8 @@ $(document).ready(function () {
 		this._intellect = (+settings.Intellect);
 		this._willpower = (+settings.Willpower);
 
-		this._dizzyValue = globalSettings.DisorientedAt;
-		this._koValue = globalSettings.UnconsciousAt;
+		this._dizzyValue = Math.max(globalSettings.DisorientedAt - (this.willpower() * 2), 0);
+		this._koValue = Math.max(globalSettings.UnconsciousAt - (this.willpower() * 2), 0);
 		this._deathValue = globalSettings.DeadAt;
 		
 		//Check stat points for conformity to rules
@@ -367,8 +367,11 @@ $(document).ready(function () {
 		
 		this._maxHP = 60 + this._endurance * 10;
 		this._maxMana = this._willpower * 10;
+		this._manaCap = this._maxMana;
 		this._maxStamina = 100;
 	
+		this.manaBurn = 0;
+		
 		this._damageEffectMult = globalSettings.GameSpeed;
 		
 		this.hp = 0;
@@ -443,7 +446,7 @@ $(document).ready(function () {
 		
 		addMana : function ( n ) { 
 			if (parseInt(n) == n) this.mana += Math.floor( n );
-			this.mana = clamp(this.mana, 0, this._maxMana);
+			this.mana = clamp(this.mana, 0, this._manaCap);
 		},
 		
 		addStamina : function ( n ) { 
@@ -477,7 +480,7 @@ $(document).ready(function () {
 		hitMana : function ( n ) {
 			var x = Math.floor( n );			
 			if (parseInt(x) == x) this.mana -= x;
-			this.mana = clamp(this.mana, 0, this._maxMana);
+			this.mana = clamp(this.mana, 0, this._manaCap);
 		},
 		
 		hitStamina : function ( n ) { 
@@ -516,12 +519,20 @@ $(document).ready(function () {
 		},
 		
 		regen : function () {
-			if( !this.isUnconscious ) {
-				this.addMana(this.willpower() / 2);
-				this.addStamina(this.endurance() / 2);
+			if( this._manaCap > this._maxMana ) {
+				this._manaCap = Math.max(this._manaCap - this.manaBurn, this._maxMana);				
+				this.manaBurn = 4;
+			}
+			
+			if( this._manaCap == this._maxMana ) this.manaBurn = 0;			
+			
+			if( this.isUnconscious == false ) {
+				this.addMana(3 + (this.willpower() / 2));
+				console.log( this._manaCap);
+				this.addStamina(3 + (this.endurance() / 2));
 			} else {
 				this.isStunned = true;
-			}
+			}			
 		},
 		
 		getStatBlock : function () {
@@ -545,17 +556,17 @@ $(document).ready(function () {
 				this.isFocused = 0;
 			}
 			
-			if ( this.hp > Math.max(this._dizzyValue - (this.willpower() * 2), 0) && this.isDisoriented > 0) {
+			if ( this.hp > this._dizzyValue && this.isDisoriented > 0) {
 				this.isDisoriented -= 1;
-				if(!this.isDisoriented) windowController.addHint( this.name + " has recovered and is no longer disoriented!" );
+				if( this.isDisoriented == 0 ) windowController.addHint( this.name + " has recovered and is no longer disoriented!" );
 			}
 			
-			if ( this.hp <= Math.max(this._dizzyValue - (this.willpower() * 2), 0) && this.isDisoriented == 0 ) {
+			if ( this.hp <= this._dizzyValue && this.isDisoriented == 0 ) {
 				this.isDisoriented = 1;
 				windowController.addHit( this.name + " is dizzy! Stats penalty!" );
 			}
 			
-			if ( this.hp <= Math.max(this._koValue - (this.willpower() * 2), 0) && this.isUnconscious == false ) {
+			if ( this.hp <= this._koValue && this.isUnconscious == false ) {
 				this.isUnconscious = true;
 				windowController.addHit( this.name + " is permanently Knocked Out (or extremely dizzy, and can not resist)! Feel free to use this opportunity! " + this.name + " must not resist! Continue beating them to get a fatality suggestion." );
 			}
@@ -1030,9 +1041,11 @@ $(document).ready(function () {
 			}
 			
 			var stamBonus = 30 + (attacker.endurance() * 2);
+			var hpBonus = 3 + ( attacker.willpower()/2 );
+			var manaBonus = hpBonus;
 			attacker.addStamina(stamBonus);
 			windowController.addHit( attacker.name + " SKIPS MOVE, RESTING!" );
-			windowController.addHint( attacker.name + " recovered " + stamBonus + " Stamina!" );
+			windowController.addHint( attacker.name + " recovered " + stamBonus + " Stamina, " + hpBonus + " health, and " + manaBonus + " mana!"  );
 			return 1;
 		},
 
@@ -1075,12 +1088,13 @@ $(document).ready(function () {
 			
 			var manaShift =  18 + roll + (attacker.willpower() * 3);
 			manaShift = Math.min( manaShift, attacker.stamina);
-			manaShift = Math.min( manaShift, attacker._maxMana - attacker.mana);
+			// manaShift = Math.min( manaShift, attacker._maxMana - attacker.mana);
 			
+			attacker._manaCap = Math.max(attacker._manaCap, attacker.mana + manaShift);
 			attacker.hitStamina(manaShift);
 			attacker.addMana(manaShift);
 			windowController.addHit( attacker.name + " CHANNELS STAMINA INTO MANA!" );
-			windowController.addHint( attacker.name + " recovered " + manaShift + " Mana!" );
+			windowController.addHint( attacker.name + " recovered " + manaShift + " Mana, and will briefly be able to hold on to more mana than usual!" );
 			return 1;
 		},
 		
