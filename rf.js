@@ -386,6 +386,8 @@ $(document).ready(function () {
 		this.cloth = 0;
 		this.addCloth( settings.Cloth );
 		
+		this._statDelta = { hp: this.hp, mana: this.mana, stamina: this.stamina, cloth: this.cloth };
+		
 		this.isUnconscious = false;
 		this.isDead = false;
 		this.isRestrained = false;
@@ -440,58 +442,59 @@ $(document).ready(function () {
 		},
 		
 		addHp : function ( n ) { 
-			if (parseInt(n) == n) this.hp += Math.floor( n ) * this._damageEffectMult;
+			var x = ~~n;			
+			this.hp += x * this._damageEffectMult;
 			this.hp = clamp(this.hp, 0, this._maxHP);
 		},
 		
 		addMana : function ( n ) { 
-			if (parseInt(n) == n) this.mana += Math.floor( n );
+			var x = ~~n;			
+			this.mana += x;
 			this.mana = clamp(this.mana, 0, this._manaCap);
 		},
 		
 		addStamina : function ( n ) { 
-			if (parseInt(n) == n) this.stamina += Math.floor( n );
+			var x = ~~n;
+			this.stamina += x;
 			this.stamina = clamp(this.stamina, 0, this._maxStamina);
 		},
 		
 		addCloth : function ( n ) { 
-			if (parseInt(n) == n) this.cloth += Math.floor( n );
+			var x = ~~n;
+			this.cloth += x;
 			this.cloth = Math.max(this.cloth, 0);
 		},
 		
 		hitHp : function ( n ) { 
-			//console.log("Damage: " + n);
-			var x = Math.floor( n );
-			if (parseInt(x) == x) {
-				x *= this._damageEffectMult;
-				this.hp -= x;
-				this.hp = clamp(this.hp, 0, this._maxHP);
-				windowController.setDamage(x);
+			var x = ~~n;			
+			x *= this._damageEffectMult;
+			this.hp -= x;
+			this.hp = clamp(this.hp, 0, this._maxHP);
+			windowController.setDamage(x);
 				
-				if (this.isFocused) {
-					if(this.isRestrained) x *= 1.5;
-					if(this.isDisoriented) x += this.isDisoriented;
-					this.isFocused = Math.max(this.isFocused - x, 0);
-					if(this.isFocused == 0) windowController.addHint( this.name + " has lost their focus/aim!" );
-				}
+			if (this.isFocused) {
+				if(this.isRestrained) x *= 1.5;
+				if(this.isDisoriented) x += this.isDisoriented;
+				this.isFocused = Math.max(this.isFocused - x, 0);
+				if(this.isFocused == 0) windowController.addHint( this.name + " has lost their focus/aim!" );
 			}
 		},
 		
 		hitMana : function ( n ) {
-			var x = Math.floor( n );			
-			if (parseInt(x) == x) this.mana -= x;
+			var x = ~~n;			
+			this.mana -= x;
 			this.mana = clamp(this.mana, 0, this._manaCap);
 		},
 		
 		hitStamina : function ( n ) { 
-			var x = Math.floor( n );
-			if (parseInt(x) == x) this.stamina -= x;
+			var x = ~~n;			
+			this.stamina -= x;
 			this.stamina = clamp(this.stamina, 0, this._maxStamina);
 		},
 		
 		hitCloth : function ( n ) {
-			var x = Math.floor( n );			
-			if (parseInt(x) == x) this.cloth -= x  * this._damageEffectMult;
+			var x = ~~n;			
+			this.cloth -= x  * this._damageEffectMult;
 			this.cloth = Math.max(this.cloth, 0);
 		},
 		
@@ -521,7 +524,7 @@ $(document).ready(function () {
 		regen : function () {
 			if( this._manaCap > this._maxMana ) {
 				this._manaCap = Math.max(this._manaCap - this.manaBurn, this._maxMana);				
-				this.manaBurn = 4;
+				this.manaBurn = 10;
 			}
 			
 			if( this._manaCap == this._maxMana ) this.manaBurn = 0;			
@@ -531,7 +534,7 @@ $(document).ready(function () {
 				var manaBonus = 2 + this.willpower();
 				this.addStamina(stamBonus);
 				this.addMana(manaBonus);
-				windowController.addHint( this.name + " recovered " + stamBonus + " stamina and " + manaBonus + " mana!"  );
+				// windowController.addHint( "At the end of her turn, " + this.name + " recovered " + stamBonus + " stamina and " + manaBonus + " mana."  );
 			} else {
 				this.isStunned = true;
 			}			
@@ -542,7 +545,35 @@ $(document).ready(function () {
 		},
 		
 		getStatus : function () {
-			var message = "[color=orange]" + this.name + "[/color][color=yellow] health: " + this.hp + "[/color][color=green] stamina: " + this.stamina + "[/color] mana: " + this.mana + "|" + this._maxMana + "[color=purple] cloth: " + this.cloth + "[/color]"; 
+			var hpDelta = this.hp - this._statDelta.hp;
+			var staminaDelta = this.stamina - this._statDelta.stamina;
+			var manaDelta = this.mana - this._statDelta.mana;
+			var clothDelta = this.cloth - this._statDelta.cloth;
+				
+			var message = "[color=orange]" + this.name;
+			message += "[/color][color=yellow] health: " + this.hp;
+			if( hpDelta > 0 ) message += "[color=cyan] (+" + hpDelta + ")[/color]";
+			if( hpDelta < 0 ) message += "[color=red] (" + hpDelta + ")[/color]";
+			
+			message += "[/color][color=green] stamina: " + this.stamina;
+			if( staminaDelta > 0 ) message += "[color=cyan] (+" + staminaDelta + ")[/color]";
+			if( staminaDelta < 0 ) message += "[color=red] (" + staminaDelta + ")[/color]";
+			
+			message += "[/color] mana: " + this.mana;
+			if( manaDelta > 0 ) message += "[color=cyan] (+" + manaDelta + ")[/color]";
+			if( manaDelta < 0 ) message += "[color=red] (" + manaDelta + ")[/color]";			
+			
+			message += "|";
+			if( this._manaCap > this._maxMana) message += "[color=cyan]";
+			message += this._manaCap;
+			if( this._manaCap > this._maxMana) message += "[/color]";			
+			
+			message += "[color=purple] cloth: " + this.cloth + "[/color]"; 
+			if( clothDelta > 0 ) message += "[color=cyan] (+" + clothDelta + ")[/color]";
+			if( clothDelta < 0 ) message += "[color=red] (" + clothDelta + ")[/color]";
+			
+			this._statDelta = { hp: this.hp, stamina: this.stamina, mana: this.mana, cloth: this.cloth };
+			
 			if( this.isRestrained ) windowController.addHint( this.name + " is Grappled." );
 			if( this.isFocused ) windowController.addHint( this.name + " is Aimed/Focused." );
 			if( !this.isInMelee ) windowController.addHint( this.name + " is too far away to melee." );
@@ -655,7 +686,7 @@ $(document).ready(function () {
 			damage = Math.max(damage, 1);
 			target.hitHp(damage);
 			stamDamage += damage;
-			windowController.addHint( target.name + " lost " + Math.floor(stamDamage) + " Stamina." );			
+			windowController.addHint( attacker.name + " dealt " + Math.floor(stamDamage) + " stamina damage to " + target.name + "." );
 			target.hitStamina (stamDamage);
 			target.hitCloth(3);
 			return 1; //Successful attack, if we ever need to check that.
@@ -902,7 +933,7 @@ $(document).ready(function () {
 			damage = Math.max(damage, 1);
 			stamDamage = Math.max(stamDamage, 1);			
 			target.hitHp(damage);
-			windowController.addHint( target.name + " lost " + Math.floor(stamDamage) + " Stamina." );			
+			windowController.addHint( attacker.name + " dealt " + Math.floor(stamDamage) + " stamina damage to " + target.name + "." );
 			target.hitStamina(stamDamage);
 			target.isStunned = true;			
 			return 1; //Successful attack, if we ever need to check that.
@@ -1043,13 +1074,13 @@ $(document).ready(function () {
 			}
 			
 			var stamBonus = 30 + (attacker.endurance() * 2);
-			var hpBonus = Math.ceil(3 + ( attacker.willpower()/2 ));
+			var hpBonus = Math.floor(3 + ( attacker.willpower()/2 ));
 			var manaBonus = hpBonus;
 			attacker.addStamina(stamBonus);
 			attacker.addHp(hpBonus);
 			attacker.addMana(manaBonus);
 			windowController.addHit( attacker.name + " SKIPS MOVE, RESTING!" );
-			windowController.addHint( attacker.name + " recovered " + stamBonus + " stamina, " + hpBonus + " health, and " + manaBonus + " mana!"  );
+			windowController.addHint( attacker.name + " recovered " + stamBonus + " stamina from resting, and a moderate amount of mana and health."  );
 			return 1;
 		},
 

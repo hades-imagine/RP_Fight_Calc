@@ -16,6 +16,11 @@
 
 
 -----------  Patch Notes  -----------------
+v.0.9.5 (April 25th, 2014):
+-- Changes to existing mechanics:
+  - Okay, those regeneration messages got a bit too verbose... going to remove them and add a more intuitive system, showing the change in HP/Mana/Stamina/Cloth in the fighter status block each turn. Added bonus, this system should automatically show the total changes from all sources to all four stats, with no need to add any message handling to new moves down the line.
+  - Fixed addMana, addStamina, and all the rest so that there should no longer be any issue with passing a non-whole number value to the function. I should have done this in the first place, and half the errors in the last few versions could have been avoided.  
+       
 v.0.9.4.2 Hotfix (April 25th, 2014):
 -- Bug Fixes:
  - Fumbling when attempting to Escape was inadvertenly costing mana, not stamina. This has been corrected.
