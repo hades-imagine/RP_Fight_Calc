@@ -16,6 +16,13 @@
 
 
 -----------  Patch Notes  -----------------
+v.0.9.4.1 Hotfix (April 24th, 2014):
+-- Bug Fixes:
+ - The bonus HP and Mana from rest are now ACTUALLY being applied to the appropriate totals.
+ - The base stamina/mana regen is no longer quite so increased... that went a bit too far.
+ - Removed some innocuous console.log messages that were just meant for testing.
+ - The default value of cloth was changed slightly, no more automatic nudity if you forget to set it to something custom.
+ 
 v.0.9.4 (April 24th, 2014):
 -- Changes to existing mechanics:
  - The base stamina/mana regen have increased slightly. At 1 Endurance/Willpower, fighters should now regen 4 points per turn, and at 10 they should regen 8.

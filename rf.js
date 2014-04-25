@@ -346,8 +346,8 @@ $(document).ready(function () {
 		this._intellect = (+settings.Intellect);
 		this._willpower = (+settings.Willpower);
 
-		this._dizzyValue = Math.max(globalSettings.DisorientedAt - (this.willpower() * 2), 0);
-		this._koValue = Math.max(globalSettings.UnconsciousAt - (this.willpower() * 2), 0);
+		this._dizzyValue = Math.max(globalSettings.DisorientedAt - (this._willpower * 2), 0);
+		this._koValue = Math.max(globalSettings.UnconsciousAt - (this._willpower * 2), 0);
 		this._deathValue = globalSettings.DeadAt;
 		
 		//Check stat points for conformity to rules
@@ -527,9 +527,8 @@ $(document).ready(function () {
 			if( this._manaCap == this._maxMana ) this.manaBurn = 0;			
 			
 			if( this.isUnconscious == false ) {
-				this.addMana(3 + (this.willpower() / 2));
-				console.log( this._manaCap);
-				this.addStamina(3 + (this.endurance() / 2));
+				this.addMana(1 + (this.willpower() / 2));
+				this.addStamina(1 + (this.endurance() / 2));
 			} else {
 				this.isStunned = true;
 			}			
@@ -1041,9 +1040,11 @@ $(document).ready(function () {
 			}
 			
 			var stamBonus = 30 + (attacker.endurance() * 2);
-			var hpBonus = 3 + ( attacker.willpower()/2 );
+			var hpBonus = Math.ceil(3 + ( attacker.willpower()/2 ));
 			var manaBonus = hpBonus;
 			attacker.addStamina(stamBonus);
+			attacker.addHp(hpBonus);
+			attacker.addMana(manaBonus);
 			windowController.addHit( attacker.name + " SKIPS MOVE, RESTING!" );
 			windowController.addHint( attacker.name + " recovered " + stamBonus + " Stamina, " + hpBonus + " health, and " + manaBonus + " mana!"  );
 			return 1;
