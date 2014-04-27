@@ -395,7 +395,8 @@ $(document).ready(function () {
 		this.isDisoriented = 0;
 		this.isGrappledBy = []; 		
 		this.isFocused = 0;
-		this.isInMelee = true;
+		//this.isInMelee = true;
+		this.isEvading = false;
 	};
 	
 	fighter.prototype = {
@@ -530,9 +531,11 @@ $(document).ready(function () {
 			if( this._manaCap == this._maxMana ) this.manaBurn = 0;			
 			
 			if( this.isUnconscious == false ) {
-				var stamBonus = 2 + this.willpower();
+				if( this.isEvading == false ) {
+					var stamBonus = 2 + this.willpower();
+					this.addStamina(stamBonus);
+				}
 				var manaBonus = 2 + this.willpower();
-				this.addStamina(stamBonus);
 				this.addMana(manaBonus);
 				// windowController.addHint( "At the end of her turn, " + this.name + " recovered " + stamBonus + " stamina and " + manaBonus + " mana."  );
 			} else {
@@ -576,7 +579,7 @@ $(document).ready(function () {
 			
 			if( this.isRestrained ) windowController.addHint( this.name + " is Grappled." );
 			if( this.isFocused ) windowController.addHint( this.name + " is Aimed/Focused." );
-			if( !this.isInMelee ) windowController.addHint( this.name + " is too far away to melee." );
+			if( this.isEvading ) windowController.addHint( this.name + " is keeping their distance." );
 			return message;
 		},
 		
@@ -650,9 +653,11 @@ $(document).ready(function () {
 			}
 			attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
 									
-			if ( !target.isInMelee ) {
-				windowController.addHit( target.name + " IS TOO FAR AWAY! " );
-				return 0; //Failed attack, if we ever need to check that.
+			if ( attacker.isEvading || target.isEvading ) {
+				difficulty += 6; //Up the difficulty if the target is evading melee.
+				damage /= 2;
+				stamDamage /= 2;
+				windowController.addHint( attacker.name + " was forced to pursue " + target.name + " and took penalties to the attack." );
 			}
 			
 			var attackTable = attacker.buildActionTable( difficulty, target.dexterity(), attacker.dexterity(), attacker.dexterity() );
@@ -716,9 +721,10 @@ $(document).ready(function () {
 			}			
 			attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
 						
-			if ( !target.isInMelee ) {
-				windowController.addHit( target.name + " IS TOO FAR AWAY! " );
-				return 0; //Failed attack, if we ever need to check that.
+			if ( attacker.isEvading || target.isEvading ) {
+				damage /= 2;
+				difficulty += 6; //Up the difficulty if the target is evading melee.
+				windowController.addHint( attacker.name + " was forced to pursue " + target.name + " and took penalties to the attack." );
 			}
 			
 			var attackTable = attacker.buildActionTable( difficulty, target.dexterity(), attacker.dexterity(), attacker.dexterity() );
@@ -777,7 +783,7 @@ $(document).ready(function () {
 			}
 			attacker.hitStamina (requiredStam - 20); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount. (We'll hit the attacker up for the rest on a miss or a dodge).
 			
-			if ( !target.isInMelee ) {
+			if ( attacker.isEvading || target.isEvading ) {
 				windowController.addHit( target.name + " IS TOO FAR AWAY! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
@@ -833,7 +839,7 @@ $(document).ready(function () {
 			var attacker = this;
 			var target = battlefield.getTarget();
 			
-			if ( !target.isInMelee ) {
+			if ( attacker.isEvading || target.isEvading ) {
 				windowController.addHit( target.name + " IS TOO FAR AWAY! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
@@ -860,12 +866,12 @@ $(document).ready(function () {
 		
 			if (attacker.isDisoriented) difficulty += 1; //Up the difficulty if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 8; //Up the massively if the attacker is restrained.			
-			if (!target.isInMelee) difficulty += 4; //Increase the difficulty if the target is not in melee, but don't make it impossible.
+			if (target.isEvading) difficulty += 4; //Increase the difficulty if the target is not in melee, but don't make it impossible.
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 4; //Lower the difficulty if the target is restrained.
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
 
-			if (!target.isInMelee) requiredStam += 20; //Increase the stamina cost if the target is not in melee
+			if (target.isEvading) requiredStam += 20; //Increase the stamina cost if the target is not in melee
 
 			var critCheck = true;
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
@@ -903,11 +909,11 @@ $(document).ready(function () {
 				stamDamage *= 1.5;
 			} 			
 
-			if ( !target.isInMelee || !attacker.isInMelee ) {
+			if ( target.isEvading || attacker.isEvading  ) {
 				windowController.addHit( attacker.name + " CHARGED " + target.name + ". ");
-				target.isInMelee = true;
-				attacker.isInMelee = true;
-				attacker.hitStamina (20);
+				target.isEvading = false;
+				attacker.isEvading = false;
+				if( target.isEvading) attacker.hitStamina (20);
 			}
 			
 			if( attacker.isGrappling( target ) ) { 
@@ -945,7 +951,7 @@ $(document).ready(function () {
 			var baseDamage = roll;
 			var damage = Math.max(attacker.dexterity(), attacker.intellect());
 			var requiredStam = 15; 
-			var difficulty = 5; //Base difficulty, rolls greater than this amount will hit.
+			var difficulty = 7; //Base difficulty, rolls greater than this amount will hit.
 		
 			if (attacker.isDisoriented) difficulty += 3; //Up the difficulty considerably if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 5; //Up the difficulty considerably if the attacker is restrained.			
@@ -983,7 +989,7 @@ $(document).ready(function () {
 			} else if ( roll >= attackTable.crit && critCheck == true) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
 				windowController.addHit( " CRITICAL HIT! " );
 				windowController.addHint( attacker.name + " hit somewhere that really hurts!" );
-				damage *= 3;				
+				damage *= 2;				
 			} else { //Normal hit.
 				windowController.addHit( " HIT! " );
 			}
@@ -1046,8 +1052,9 @@ $(document).ready(function () {
 				windowController.addHint( "Critical Hit! " + attacker.name + "'s magic worked abnormally well! " + target.name + " is dazed and disoriented.");
 			} else { //Normal hit.
 				windowController.addHit( "MAGIC HIT! " );
-				attacker.hitMana (requiredMana /2); 
 			}			
+			
+			attacker.hitMana (requiredMana /2); 
 			
 			//Deal all the actual damage/effects here.
 			damage += baseDamage;
@@ -1059,14 +1066,17 @@ $(document).ready(function () {
 		
 		actionRest : function ( roll ) {
 			var attacker = this;
+			var target = battlefield.getTarget();
+			
+			if (attacker.isEvading) attacker.isEvading = false; //If you stop to rest, you stop evading melee.
 			
 			var difficulty = 4; //Base difficulty, rolls greater than this amount will succeed. 
 		
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if you are dizzy.
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if you are restrained.
-			if (!attacker.isInMelee) difficulty -= 4; //Lower the difficulty if you are not in melee.
+			if (attacker.isEvading || target.isEvading) difficulty -= 4; //Lower the difficulty if you are not in melee.
 			
-			difficulty -= attacker.willpower() / 2;
+			difficulty -= attacker.willpower() / 2;			
 			
 			if (roll <= difficulty ) {	//Failed!
 				windowController.addHint( attacker.name + " was too disoriented or distracted to get any benefit from resting." );
@@ -1086,12 +1096,13 @@ $(document).ready(function () {
 
 		actionFocus : function ( roll ) {
 			var attacker = this;
+			var target = battlefield.getTarget();
 			
 			var difficulty = 4; //Base difficulty, rolls greater than this amount will succeed.
 		
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if you are dizzy.
 			if (attacker.isRestrained) difficulty += 2; //Up the difficulty considerably if you are restrained.
-			if (!attacker.isInMelee) difficulty -= 4; //Lower the difficulty if you are not in melee.
+			if (attacker.isEvading || target.isEvading) difficulty -= 4; //Lower the difficulty if you are not in melee.
 		
 			difficulty -= attacker.willpower() / 2;
 			
@@ -1107,12 +1118,13 @@ $(document).ready(function () {
 		
 		actionChannel : function ( roll ) {
 			var attacker = this;
+			var target = battlefield.getTarget();
 			
 			var difficulty = 4; //Base difficulty, rolls greater than this amount will succeed. 
 		
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if you are dizzy.
 			if (attacker.isRestrained) difficulty += 4; //Up the difficulty considerably if you are restrained.
-			if (!attacker.isInMelee) difficulty -= 4; //Lower the difficulty if you are not in melee.
+			if (attacker.isEvading || target.isEvading) difficulty -= 4; //Lower the difficulty if you are not in melee.
 			
 			difficulty -= attacker.willpower() / 2;
 		
@@ -1139,6 +1151,12 @@ $(document).ready(function () {
 			var requiredStam = 20;
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
 		
+			if (attacker.isEvading) {
+				windowController.addHint( attacker.name + " stopped trying to avoid melee." );
+				attacker.isEvading = false; //If you are already evading melee, this will let you stop it without stamina cost or a roll for success.
+				return 1;
+			}
+			
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if the attacker is restrained.
 			if (target.isDisoriented) difficulty -= 2; //Lower the difficulty if the attacker is dizzy.
@@ -1174,9 +1192,9 @@ $(document).ready(function () {
 				attacker.addStamina (10);
 			} 		
 		
-			if( !target.isInMelee ) { //If you're not in melee, this becomes pursue.
-				target.isInMelee = true;
-				attacker.isInMelee = true;
+			if( target.isEvading ) { //If the target is evading melee, this becomes pursue.
+				target.isEvading = false;
+				attacker.isEvading = false;
 				windowController.addHint( attacker.name + " closed the distance between them and " + target.name + ", and is now in melee with them." );	
 				return 1; //Successful attack, if we ever need to check that.				
 			}
@@ -1190,15 +1208,19 @@ $(document).ready(function () {
 				windowController.addHint( attacker.name + " escaped " + target.name + "'s hold! " );
 				attacker.removeGrappler( target );			
 			} else { //Otherwise you open up some distance between you and your foe.
-				windowController.addHint( attacker.name + " managed to put some distance between them and " + target.name + ". " + target.name + " will have to pursue/find them before they use any melee attacks." );
-				attacker.isInMelee = false;
-				target.isInMelee = false;				
+				windowController.addHint( attacker.name + " managed to put some distance between them and " + target.name + ". " + attacker.name + " is now actively evading melee, at the cost of their normal stamina regen." );
+				attacker.isEvading = true;
 			}
 			return 1; //Successful attack, if we ever need to check that.
 		},
 
 		actionFumble : function ( action ) {
 			var attacker = this;
+			
+			if( attacker.isEvading && action == "Escape" ) {
+				attacker.isEvading = false; //If you are already evading melee, this will let you stop it without stamina cost or a roll for success.
+				return 1;				
+			}
 			
 			switch (action) 
 			{
@@ -1227,6 +1249,8 @@ $(document).ready(function () {
 				windowController.addHint( attacker.name + " could not calm their nerves." );
 				break;
 			}
+			
+			windowController.addHit( " FUMBLE! " );
 		},
 		
 		isGrappling : function ( target ) {
@@ -1325,7 +1349,6 @@ $(document).ready(function () {
 		if (roll > 1) {
 			actor["action" + action]( roll );
 		} else {
-			windowController.addHit( " FUMBLE! " );
 			actor.actionFumble(action);
 		}
 		

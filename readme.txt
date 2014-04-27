@@ -16,6 +16,13 @@
 
 
 -----------  Patch Notes  -----------------
+v.0.9.5.1 (April 27th, 2014):
+Just a few quick changes this time to shore up the balance of things while I work on the next big patch (v.0.9.6), which should be the last major change/addition to the mechanics. After 0.9.6 is in and stable, I'm going to be working on the UI, then adding a save/undo feature (some of the backend for that is already in the works, but I want to make very sure that it works perfectly before exposing it in the UI), and when I'm relatively certain all the bugs have been ironed out and the system is stable-- taking things out of testing (v 1.0). After that, I'll look at adding extra features as I find time, things like stage specific hazards/bonuses... more options for character customization/theming/specialties... etc.
+  - Crits and glancing hits with magic attacks should cost the appropriate amount of mana now. Misses, fumbles, and dodges still have a reduced cost.
+  - Ranged attacks should no longer crit quite as hard or be quite as accurate.
+  - Being 'out of melee/evading' will no longer make melee attacks impossible, it will instead reduce their damage/effects and make them considerably more difficult (on par with the added difficulty for ranged attacks and magic when being grappled). Grappling someone, or damaging/ripping their clothing, will still be impossible until you catch up to them. Landing a melee attack against someone who is evading you will NOT drop you back into melee, it just represents you finding a chance to land a single attack before they get away once more. You will still need to charge or pursue someone to pull them back into melee semi-permanently.
+  - While evading pursuit/staying out of melee, your normal stamina regen will no longer function, and if you stop to rest, you will drop back into melee afterward. You may also reenter melee at any time by using tackle (at the normal cost), or using escape again to abandon the chase without stamina cost.
+
 v.0.9.5 (April 25th, 2014):
 -- Changes to existing mechanics:
   - Okay, those regeneration messages got a bit too verbose... going to remove them and add a more intuitive system, showing the change in HP/Mana/Stamina/Cloth in the fighter status block each turn. Added bonus, this system should automatically show the total changes from all sources to all four stats, with no need to add any message handling to new moves down the line.
