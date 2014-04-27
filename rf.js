@@ -402,7 +402,7 @@ $(document).ready(function () {
 	fighter.prototype = {
 		strength : function () { 
 			var total = this._strength;
-			total -= this.isDisoriented;
+			if( this.isDisoriented > 0) total -= 1;
 			if (this.isRestrained) total = total / 2;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
@@ -411,7 +411,7 @@ $(document).ready(function () {
 		
 		dexterity : function () { 
 			var total = this._dexterity; 
-			total -= this.isDisoriented;
+			if( this.isDisoriented > 0) total -= 1;
 			if (this.isRestrained) total = total / 2;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
@@ -420,7 +420,7 @@ $(document).ready(function () {
 		
 		endurance : function () { 
 			var total = this._endurance;
-			total -= this.isDisoriented;
+			if( this.isDisoriented > 0) total -= 1;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
 			return total;
@@ -428,7 +428,7 @@ $(document).ready(function () {
 		
 		intellect : function () { 
 			var total = this._intellect;
-			total -= this.isDisoriented;
+			if( this.isDisoriented > 0) total -= 1;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
 			return total;
@@ -436,7 +436,7 @@ $(document).ready(function () {
 		
 		willpower : function () { 
 			var total = this._willpower;
-			total -= this.isDisoriented;
+			if( this.isDisoriented > 0) total -= 1;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
 			return total;
@@ -641,9 +641,9 @@ $(document).ready(function () {
 			var difficulty = 1;
 			
 			if (attacker.isDisoriented) difficulty += 1; //Up the difficulty if the attacker is dizzy.
-			if (attacker.isRestrained) difficulty += 6; //Up the difficulty if the attacker is restrained.			
+			if (attacker.isRestrained) difficulty += 2; //Up the difficulty if the attacker is restrained.			
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
-			if (target.isRestrained) difficulty -= 3; //Lower it if the target is restrained.
+			if (target.isRestrained) difficulty -= 2; //Lower it if the target is restrained.
 			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused.
 						
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
@@ -706,9 +706,9 @@ $(document).ready(function () {
 			var difficulty = 8; //Base difficulty, rolls greater than this amount will hit.
 		
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
-			if (attacker.isRestrained) difficulty += 6; //Up the difficulty if the attacker is restrained.			
+			if (attacker.isRestrained) difficulty += 2; //Up the difficulty if the attacker is restrained.			
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
-			if (target.isRestrained) difficulty -= 3; //Lower it if the target is restrained.
+			if (target.isRestrained) difficulty -= 2; //Lower it if the target is restrained.
 			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused
 			
 			var critCheck = true;
@@ -815,11 +815,12 @@ $(document).ready(function () {
 			if ( attacker.isGrappling( target ) ) { 
 				windowController.addHit( " SUBMISSION " );
 				damage += attacker.strength()*2;
+				target.isDisoriented += 3; //Submission moves disorient the target. The longer you can hold the submission, the more disoriented they become.
 				if (target.isGrappling( attacker )){
 					attacker.removeGrappler( target );
-					windowController.addHint( target.name + " is in a SUBMISSION hold, taking damage, and " + attacker.name + " is no longer at a penalty from being grappled!" );
+					windowController.addHint( target.name + " is in a SUBMISSION hold, taking damage and suffering disorientation from the pain. " + attacker.name + " is also no longer at a penalty from being grappled!" );
 				} else {
-					windowController.addHint( target.name + " is in a SUBMISSION hold, taking damage.");
+					windowController.addHint( target.name + " is in a SUBMISSION hold, taking damage and suffering disorientation from the pain.");
 				}
 			} else {
 				windowController.addHit( attacker.name + " GRABBED " + target.name + "! " ); 
@@ -1169,6 +1170,12 @@ $(document).ready(function () {
 			attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
 			
 			var attackTable = attacker.buildActionTable( difficulty, target.dexterity(), attacker.dexterity(), attacker.dexterity() );
+			var tempGrappleFlag = true;
+			if ( attacker.isGrappling( target ) ) { //If you're grappling someone they are freed, regardless of the outcome.
+				windowController.addHint( attacker.name + " used ESCAPE. " + target.name + " is no longer being grappled. " );
+				target.removeGrappler( attacker );	
+				tempGrappleFlag = false;
+			}
 			
 			if ( roll <= attackTable.miss ) {	//Miss-- no effect.
 				windowController.addHit( "FAILED! " );
@@ -1197,17 +1204,15 @@ $(document).ready(function () {
 				attacker.isEvading = false;
 				windowController.addHint( attacker.name + " closed the distance between them and " + target.name + ", and is now in melee with them." );	
 				return 1; //Successful attack, if we ever need to check that.				
-			}
-			
-			if ( attacker.isGrappling( target ) ) { //If you're grappling someone they are freed.
-				windowController.addHint( attacker.name + " used ESCAPE. " + target.name + " you are no longer being grappled. " );
-				target.removeGrappler( attacker );	
-			} 
-			
+			}			
+
 			if( target.isGrappling( attacker ) ) { //If you were being grappled, you get free.
 				windowController.addHint( attacker.name + " escaped " + target.name + "'s hold! " );
-				attacker.removeGrappler( target );			
-			} else { //Otherwise you open up some distance between you and your foe.
+				attacker.removeGrappler( target );		
+				tempGrappleFlag = false;				
+			} 
+
+			if (tempGrappleFlag) { //If you weren't grappling or being grappled, try to evade.
 				windowController.addHint( attacker.name + " managed to put some distance between them and " + target.name + ". " + attacker.name + " is now actively evading melee, at the cost of their normal stamina regen." );
 				attacker.isEvading = true;
 			}

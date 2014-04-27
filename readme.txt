@@ -16,6 +16,11 @@
 
 
 -----------  Patch Notes  -----------------
+v.0.9.5.2 (April 27th, 2014):
+Another quick balance fix to hold things together until the next major patch.
+  - Light and Heavy attacks are much less difficult to use while restrained/grappled now. Submission moves now inflict a dizzy/disorient effect though, so it is still in your best interests to try and take control of the grapple if someone gets ahold of you.
+  - Slapped a really kludgey patch on some iffy conditional logic in how grapples work. The fix should resolve an issue where someone who was grappling their foe could escape the grapple and then immediately ALSO escape from melee... but it's not exactly an elegant fix. Good enough until the next big patch though, which will be reorganizing that code anyway.
+  
 v.0.9.5.1 (April 27th, 2014):
 Just a few quick changes this time to shore up the balance of things while I work on the next big patch (v.0.9.6), which should be the last major change/addition to the mechanics. After 0.9.6 is in and stable, I'm going to be working on the UI, then adding a save/undo feature (some of the backend for that is already in the works, but I want to make very sure that it works perfectly before exposing it in the UI), and when I'm relatively certain all the bugs have been ironed out and the system is stable-- taking things out of testing (v 1.0). After that, I'll look at adding extra features as I find time, things like stage specific hazards/bonuses... more options for character customization/theming/specialties... etc.
   - Crits and glancing hits with magic attacks should cost the appropriate amount of mana now. Misses, fumbles, and dodges still have a reduced cost.
