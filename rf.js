@@ -1192,7 +1192,7 @@ $(document).ready(function () {
 
 			if ( roll <= attackTable.glancing && target.canDodge(attacker) ) { //Glancing blow-- reduced damage/effect, typically half normal.
 				windowController.addHit( " CLOSE CALL! " );
-				windowController.addHint( target.name + " succeeded, but it was a close call, and cost them more stamina than usual. " );				
+				windowController.addHint( attacker.name + " succeeded, but it was a close call, and cost them more stamina than usual. " );				
 				attacker.hitStamina (10);
 			} else if ( roll >= attackTable.crit ) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
 				windowController.addHit( " CRITICAL SUCCESS! " );
