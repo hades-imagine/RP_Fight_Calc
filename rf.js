@@ -642,6 +642,7 @@ $(document).ready(function () {
 			
 			if (attacker.isDisoriented) difficulty += 1; //Up the difficulty if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 2; //Up the difficulty if the attacker is restrained.			
+			if (target.isFocused ) difficulty += 2;
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 2; //Lower it if the target is restrained.
 			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused.
@@ -706,7 +707,8 @@ $(document).ready(function () {
 			var difficulty = 8; //Base difficulty, rolls greater than this amount will hit.
 		
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
-			if (attacker.isRestrained) difficulty += 2; //Up the difficulty if the attacker is restrained.			
+			if (attacker.isRestrained) difficulty += 2; //Up the difficulty if the attacker is restrained.	
+			if (target.isFocused ) difficulty += 2;			
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 2; //Lower it if the target is restrained.
 			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused
@@ -771,7 +773,7 @@ $(document).ready(function () {
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
 			//if (attacker.isRestrained) difficulty += 2; //Up the difficulty slightly if the attacker is restrained.	
 			if (target.isRestrained) difficulty += 2; //Submission moves are more difficult
-			
+			if (target.isFocused ) difficulty += 2; 
 			if (target.isDisoriented) difficulty -= 2; //Lower the difficulty if the target is dizzy.
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
 
@@ -868,8 +870,9 @@ $(document).ready(function () {
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
 		
 			if (attacker.isDisoriented) difficulty += 1; //Up the difficulty if the attacker is dizzy.
-			if (attacker.isRestrained) difficulty += 8; //Up the massively if the attacker is restrained.			
+			if (attacker.isRestrained) difficulty += 8; //Up the difficulty massively if the attacker is restrained.			
 			if (target.isEvading) difficulty += 4; //Increase the difficulty if the target is not in melee, but don't make it impossible.
+			if (target.isFocused ) difficulty += 2;
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 4; //Lower the difficulty if the target is restrained.
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
@@ -958,6 +961,7 @@ $(document).ready(function () {
 		
 			if (attacker.isDisoriented) difficulty += 3; //Up the difficulty considerably if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 5; //Up the difficulty considerably if the attacker is restrained.			
+			if (target.isFocused ) difficulty += 3;
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 2; //Lower the difficulty slightly if the target is restrained.
 			if (attacker.isFocused) difficulty -= 5; //Lower the difficulty considerably if the attacker is focused
@@ -1010,12 +1014,12 @@ $(document).ready(function () {
 			var target = battlefield.getTarget();
 			var baseDamage = roll/2 + attacker.intellect();
 			var damage = 2 * attacker.intellect();
-			var requiredMana = 30;
+			var requiredMana = 20;
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
 		
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if the attacker is restrained.
-			
+			if (target.isFocused ) difficulty += 2;
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 2; //Lower the difficulty slightly if the target is restrained.
 			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused
@@ -1071,13 +1075,13 @@ $(document).ready(function () {
 			var attacker = this;
 			var target = battlefield.getTarget();
 			
-			if (attacker.isEvading) attacker.isEvading = false; //If you stop to rest, you stop evading melee.
-			
 			var difficulty = 4; //Base difficulty, rolls greater than this amount will succeed. 
 		
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if you are dizzy.
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if you are restrained.
 			if (attacker.isEvading || target.isEvading) difficulty -= 4; //Lower the difficulty if you are not in melee.
+
+			if (attacker.isEvading) attacker.isEvading = false; //If you stop to rest, you stop evading melee.
 			
 			difficulty -= attacker.willpower();			
 			
@@ -1136,7 +1140,7 @@ $(document).ready(function () {
 				return 0; //Failed action, if we ever need to check that.
 			}
 			
-			var manaShift =  18 + roll + (attacker.willpower() * 3);
+			var manaShift =  12 + roll + (attacker.willpower() * 2);
 			manaShift = Math.min( manaShift, attacker.stamina);
 			// manaShift = Math.min( manaShift, attacker._maxMana - attacker.mana);
 			
@@ -1161,9 +1165,9 @@ $(document).ready(function () {
 			}
 			
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
-			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if the attacker is restrained.
+			if (attacker.isRestrained) difficulty += 4; //Up the difficulty considerably if the attacker is restrained.
 			if (target.isDisoriented) difficulty -= 2; //Lower the difficulty if the attacker is dizzy.
-			if (target.isRestrained) difficulty -= 6; //Lower the difficulty considerably if the target is restrained.
+			if (target.isRestrained) difficulty -= 4; //Lower the difficulty considerably if the target is restrained.
 			
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
 				difficulty += 20; // Too tired? You're going to fail.
@@ -1247,7 +1251,7 @@ $(document).ready(function () {
 				attacker.hitStamina(5);
 				break;
 			case "Magic":
-				attacker.hitMana(15);
+				attacker.hitMana(10);
 				break;
 			case "Escape":
 				attacker.hitStamina(10);

@@ -16,6 +16,12 @@
 
 
 -----------  Patch Notes  -----------------
+v.0.9.5.4 (April 28th, 2014):
+Testing one last set of balance changes, hopefully something that will help out mage types a bit.
+  - Reduced the cost of magic to 20 mana. Mana gained/Stamina lost from Channel has also been reduced by a similar degree, but this should make a mage's initial mana (from willpower) more valuable.
+  - Reduced the penalties to magic and ranged attacks slightly when grappled.
+  - Focus/Aim will now make you slightly harder to hit with most attacks, in addition to making your attacks slightly easier.
+  
 v.0.9.5.3 (April 28th, 2014):
 Last quick balance change, hopefully. 
   - When grappling someone, neither you nor the target will be able to dodge attacks.
