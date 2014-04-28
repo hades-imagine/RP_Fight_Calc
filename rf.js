@@ -403,7 +403,7 @@ $(document).ready(function () {
 		strength : function () { 
 			var total = this._strength;
 			if( this.isDisoriented > 0) total -= 1;
-			if (this.isRestrained) total = total / 2;
+			if (this.isRestrained) total -= 2;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
 			return total;
@@ -412,7 +412,7 @@ $(document).ready(function () {
 		dexterity : function () { 
 			var total = this._dexterity; 
 			if( this.isDisoriented > 0) total -= 1;
-			if (this.isRestrained) total = total / 2;
+			if (this.isRestrained) total -= 2;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
 			return total;
@@ -667,13 +667,13 @@ $(document).ready(function () {
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
-			if( roll <= attackTable.dodge && !(attacker.isGrappling(target))  ) {	//Dodged-- no effect.
+			if( roll <= attackTable.dodge && target.canDodge(attacker) ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
-			if ( roll <= attackTable.glancing ) { //Glancing blow-- reduced damage/effect, typically half normal.
+			if ( roll <= attackTable.glancing && target.canDodge(attacker) ) { //Glancing blow-- reduced damage/effect, typically half normal.
 				windowController.addHit( " GLANCING HIT! " );
 				windowController.addHint( target.name + " avoided taking full damage. " );
 				damage /= 2;
@@ -734,13 +734,13 @@ $(document).ready(function () {
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
-			if( roll <= attackTable.dodge && !(attacker.isGrappling(target))  ) {	//Dodged-- no effect.
+			if( roll <= attackTable.dodge && target.canDodge(attacker) ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
-			if ( roll <= attackTable.glancing ) { //Glancing blow-- reduced damage/effect, typically half normal.
+			if ( roll <= attackTable.glancing && target.canDodge(attacker) ) { //Glancing blow-- reduced damage/effect, typically half normal.
 				windowController.addHit( " GLANCING HIT! " );
 				windowController.addHint( target.name + " avoided taking full damage. " );
 				damage /= 2;
@@ -769,7 +769,9 @@ $(document).ready(function () {
 			var difficulty = 8; //Base difficulty, rolls greater than this amount will hit.
 		
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
-			if (attacker.isRestrained) difficulty += 2; //Up the difficulty slightly if the attacker is restrained.			
+			//if (attacker.isRestrained) difficulty += 2; //Up the difficulty slightly if the attacker is restrained.	
+			if (target.isRestrained) difficulty += 2; //Submission moves are more difficult
+			
 			if (target.isDisoriented) difficulty -= 2; //Lower the difficulty if the target is dizzy.
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
 
@@ -781,7 +783,7 @@ $(document).ready(function () {
 				difficulty += 4; // Too tired? You're likely to miss.
 				windowController.addHint( attacker.name + " did not have enough stamina, and took penalties to the attack." );
 			}
-			attacker.hitStamina (requiredStam - 20); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount. (We'll hit the attacker up for the rest on a miss or a dodge).
+			attacker.hitStamina (20); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount. (We'll hit the attacker up for the rest on a miss or a dodge).
 			
 			if ( attacker.isEvading || target.isEvading ) {
 				windowController.addHit( target.name + " IS TOO FAR AWAY! " );
@@ -793,14 +795,14 @@ $(document).ready(function () {
 			if ( roll <= attackTable.miss ) {	//Miss-- no effect.
 				windowController.addHit( " FAILED! " );
 				windowController.addHint( attacker.name + " failed to establish a hold!" );
-				attacker.hitStamina (20);
+				attacker.hitStamina (15);
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
-			if( roll <= attackTable.dodge && !(attacker.isGrappling(target))  ) {	//Dodged-- no effect.
+			if( roll <= attackTable.dodge && target.canDodge(attacker)  ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " was too fast, and escaped before " + attacker.name + " could establish a hold.");
-				attacker.hitStamina (20);
+				attacker.hitStamina (15);
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
@@ -814,8 +816,8 @@ $(document).ready(function () {
 						
 			if ( attacker.isGrappling( target ) ) { 
 				windowController.addHit( " SUBMISSION " );
-				damage += attacker.strength()*2;
-				target.isDisoriented += 3; //Submission moves disorient the target. The longer you can hold the submission, the more disoriented they become.
+				damage += attacker.strength()*2;				
+				target.isDisoriented += 2; //Submission moves disorient the target. 
 				if (target.isGrappling( attacker )){
 					attacker.removeGrappler( target );
 					windowController.addHint( target.name + " is in a SUBMISSION hold, taking damage and suffering disorientation from the pain. " + attacker.name + " is also no longer at a penalty from being grappled!" );
@@ -894,14 +896,14 @@ $(document).ready(function () {
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
-			if( roll <= attackTable.dodge && !(attacker.isGrappling(target))  ) {	//Dodged-- no effect.
+			if( roll <= attackTable.dodge && target.canDodge(attacker) ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
 				attacker.hitStamina (20);
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
-			if ( roll <= attackTable.glancing ) { //Glancing blow-- reduced damage/effect, typically half normal.
+			if ( roll <= attackTable.glancing && target.canDodge(attacker) ) { //Glancing blow-- reduced damage/effect, typically half normal.
 				windowController.addHint( target.name + " rolled with the blow. They are still stunned, but lost less stamina. " );
 				stamDamage -= 20;
 			} else if ( roll >= attackTable.crit && critCheck == true) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
@@ -927,9 +929,9 @@ $(document).ready(function () {
 				}
 				windowController.addHint( target.name + ", you are no longer grappled. You should make your post, but you should only emote being hit, do not try to perform any other actions." );
 			} else if ( target.isGrappling( attacker )){
-					attacker.removeGrappler( target );
-					windowController.addHit( attacker.name + " found a hold and THREW " + target.name + " off! " + attacker.name + " can make another move! "  + attacker.name + " is no longer at a penalty from being grappled!" );
-					windowController.addHint( target.name + ", you should make your post, but you should only emote being hit, do not try to perform any other actions." );			
+				attacker.removeGrappler( target );
+				windowController.addHit( attacker.name + " found a hold and THREW " + target.name + " off! " + attacker.name + " can make another move! "  + attacker.name + " is no longer at a penalty from being grappled!" );
+				windowController.addHint( target.name + ", you should make your post, but you should only emote being hit, do not try to perform any other actions." );			
 			} else {
 				windowController.addHit( attacker.name + " TACKLED " + target.name + ". " + attacker.name + " can take another action while their opponent is stunned!" );
 				windowController.addHint( target.name + ", you should make your post, but you should only emote being hit, do not try to perform any other actions." );			
@@ -977,13 +979,13 @@ $(document).ready(function () {
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
-			if( roll <= attackTable.dodge && !(attacker.isGrappling(target))  ) {	//Dodged-- no effect.
+			if( roll <= attackTable.dodge && target.canDodge(attacker)  ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
-			if ( roll <= attackTable.glancing ) { //Glancing blow-- reduced damage/effect, typically half normal.
+			if ( roll <= attackTable.glancing && target.canDodge(attacker) ) { //Glancing blow-- reduced damage/effect, typically half normal.
 				windowController.addHit( " GLANCING HIT! " );
 				windowController.addHint( target.name + " only took a flesh wound. " );
 				damage /= 2;
@@ -1035,13 +1037,13 @@ $(document).ready(function () {
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
-			if( roll <= attackTable.dodge && !(attacker.isGrappling(target))  ) {	//Dodged-- no effect.
+			if( roll <= attackTable.dodge && target.canDodge(attacker)  ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
-			if ( roll <= attackTable.glancing ) { //Glancing blow-- reduced damage/effect, typically half normal.
+			if ( roll <= attackTable.glancing && target.canDodge(attacker) ) { //Glancing blow-- reduced damage/effect, typically half normal.
 				windowController.addHit( " GLANCING HIT! " );
 				windowController.addHint( target.name + " avoided taking full damage. " );
 				damage /= 2;
@@ -1077,7 +1079,7 @@ $(document).ready(function () {
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if you are restrained.
 			if (attacker.isEvading || target.isEvading) difficulty -= 4; //Lower the difficulty if you are not in melee.
 			
-			difficulty -= attacker.willpower() / 2;			
+			difficulty -= attacker.willpower();			
 			
 			if (roll <= difficulty ) {	//Failed!
 				windowController.addHint( attacker.name + " was too disoriented or distracted to get any benefit from resting." );
@@ -1105,7 +1107,7 @@ $(document).ready(function () {
 			if (attacker.isRestrained) difficulty += 2; //Up the difficulty considerably if you are restrained.
 			if (attacker.isEvading || target.isEvading) difficulty -= 4; //Lower the difficulty if you are not in melee.
 		
-			difficulty -= attacker.willpower() / 2;
+			difficulty -= attacker.willpower();
 			
 			if (roll <= difficulty ) {	//Failed!
 				windowController.addHint( attacker.name + " was too disoriented or distracted to focus." );
@@ -1127,7 +1129,7 @@ $(document).ready(function () {
 			if (attacker.isRestrained) difficulty += 4; //Up the difficulty considerably if you are restrained.
 			if (attacker.isEvading || target.isEvading) difficulty -= 4; //Lower the difficulty if you are not in melee.
 			
-			difficulty -= attacker.willpower() / 2;
+			difficulty -= attacker.willpower();
 		
 			if (roll <= difficulty ) {	//Failed!
 				windowController.addHint( attacker.name + " was too disoriented or distracted to channel." );
@@ -1182,13 +1184,13 @@ $(document).ready(function () {
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
-			if( roll <= attackTable.dodge && !(attacker.isGrappling(target))  ) {	//Dodged-- no effect.
+			if( roll <= attackTable.dodge && target.canDodge(attacker)  ) {	//Dodged-- no effect.
 				windowController.addHit( target.name + " WAS TOO QUICK! " );
 				windowController.addHint( attacker.name + " failed. " + target.name + " was just too quick for them." );
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
-			if ( roll <= attackTable.glancing ) { //Glancing blow-- reduced damage/effect, typically half normal.
+			if ( roll <= attackTable.glancing && target.canDodge(attacker) ) { //Glancing blow-- reduced damage/effect, typically half normal.
 				windowController.addHit( " CLOSE CALL! " );
 				windowController.addHint( target.name + " succeeded, but it was a close call, and cost them more stamina than usual. " );				
 				attacker.hitStamina (10);
@@ -1256,6 +1258,11 @@ $(document).ready(function () {
 			}
 			
 			windowController.addHit( " FUMBLE! " );
+		},
+		
+		canDodge : function ( attacker ) {
+			if( this.isGrappling(attacker) || this.isGrappledBy.length != 0 ) return false;	
+			return true;
 		},
 		
 		isGrappling : function ( target ) {

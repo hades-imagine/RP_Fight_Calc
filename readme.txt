@@ -16,6 +16,14 @@
 
 
 -----------  Patch Notes  -----------------
+v.0.9.5.3 (April 28th, 2014):
+Last quick balance change, hopefully. 
+  - When grappling someone, neither you nor the target will be able to dodge attacks.
+  - The stat reduction from grapple has been considerably reduced.
+  - The difficulty of submission moves has been increased slightly, and the difficulty of grabbing someone back is no longer increased.
+  - The cost of using grab successfully has increased (20 stamina rather than 15), though the total cost on a miss, dodge, or fumble remains unchanged.
+  - The effects of willpower on the difficulty of Rest, Focus, and Channel have been increased.
+
 v.0.9.5.2 (April 27th, 2014):
 Another quick balance fix to hold things together until the next major patch.
   - Light and Heavy attacks are much less difficult to use while restrained/grappled now. Submission moves now inflict a dizzy/disorient effect though, so it is still in your best interests to try and take control of the grapple if someone gets ahold of you.
