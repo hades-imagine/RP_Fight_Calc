@@ -1,8 +1,6 @@
 -- Questions concerning the current development:
 
- - Should submission moves and Grappling crits do something more than just extra damage? Possibly a dizzy/disorientation effect?
-
- - For non casters, Intellect doesn't do terribly much at the moment... Any suggestions regarding additional effects Intellect might have? (Resisting goads and disorienting blows and such, or buffing defensive moves possibly?)
+ - None just now.
 
 -- Possible future development:
 
@@ -14,8 +12,12 @@
 
  - Stage specific hazards/bonuses?
 
-
 -----------  Patch Notes  -----------------
+v.0.9.5.5 (May 3rd, 2014):
+  - The cost of magic has gone back up, slightly, to 24 mana and the accuracy has been slightly reduced (Magic is now on par with a heavy attack in terms of accuracy). Mana gained/Stamina lost from Channel has also been increased by a similar degree.
+  - The cost of ranged attacks has increased to 20 stamina, and their accuracy has been reduced. When aiming/focused it should still hit reliably, but not ~100% of the time unless you also have a very significant advantage in Dexterity. Both of these changes may be superseded at some point by other, more in depth changes to ranged attacks, at which point they will return to their original stamina cost and accuracy.
+  - Fixed a messaging error when escaping from melee.
+  
 v.0.9.5.4 (April 28th, 2014):
 Testing one last set of balance changes, hopefully something that will help out mage types a bit.
   - Reduced the cost of magic to 20 mana. Mana gained/Stamina lost from Channel has also been reduced by a similar degree, but this should make a mage's initial mana (from willpower) more valuable.
