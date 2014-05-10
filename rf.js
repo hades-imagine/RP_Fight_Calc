@@ -652,7 +652,7 @@ $(document).ready(function () {
 				difficulty += 2; // Too tired? You might miss more often.
 				windowController.addHint( attacker.name + " did not have enough stamina, and took penalties to the attack." );			
 			}
-			attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
+			// attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
 									
 			if ( attacker.isEvading || target.isEvading ) {
 				difficulty += 6; //Up the difficulty if the target is evading melee.
@@ -665,12 +665,14 @@ $(document).ready(function () {
 
 			if ( roll <= attackTable.miss ) {	//Miss-- no effect.
 				windowController.addHit( " MISS! " );
+				attacker.hitStamina ( requiredStam - (attacker.intellect() * 2) );
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
 			if( roll <= attackTable.dodge && target.canDodge(attacker) ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
+				attacker.hitStamina ( requiredStam - (attacker.intellect() * 2) );
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
@@ -688,6 +690,9 @@ $(document).ready(function () {
 			}
 			
 			//Deal all the actual damage/effects here.
+			
+			attacker.hitStamina ( requiredStam );
+			
 			damage += baseDamage;
 			damage = Math.max(damage, 1);
 			target.hitHp(damage);
@@ -721,7 +726,7 @@ $(document).ready(function () {
 				difficulty += 4; // Too tired? You're likely to miss.
 				windowController.addHint( attacker.name + " did not have enough stamina, and took penalties to the attack." );
 			}			
-			attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
+			//attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
 						
 			if ( attacker.isEvading || target.isEvading ) {
 				damage /= 2;
@@ -733,12 +738,14 @@ $(document).ready(function () {
 			
 			if ( roll <= attackTable.miss ) {	//Miss-- no effect.
 				windowController.addHit( " MISS! " );
+				attacker.hitStamina ( requiredStam - (attacker.intellect() * 2) );
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
 			if( roll <= attackTable.dodge && target.canDodge(attacker) ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
+				attacker.hitStamina ( requiredStam - (attacker.intellect() * 2) );
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
@@ -755,6 +762,9 @@ $(document).ready(function () {
 			}
 			
 			//Deal all the actual damage/effects here.
+			
+			attacker.hitStamina ( requiredStam );
+			
 			damage += baseDamage;
 			damage = Math.max(damage, 1);
 			target.hitHp(damage);
@@ -770,11 +780,14 @@ $(document).ready(function () {
 			var requiredStam = 35;
 			var difficulty = 8; //Base difficulty, rolls greater than this amount will hit.
 		
-			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
 			//if (attacker.isRestrained) difficulty += 2; //Up the difficulty slightly if the attacker is restrained.	
-			if (target.isRestrained) difficulty += 2; //Submission moves are more difficult
-			if (target.isFocused ) difficulty += 2; 
+			//if (target.isRestrained) difficulty += 2; //Submission moves are more difficult
+			
+			if (target.isRestrained) difficulty += Math.max(0, 2 + Math.floor((target.strength() - attacker.strength()) / 2)); //Up the difficulty of submission moves based on the relative strength of the combatants. Minimum of +0 difficulty, maximum of +8.
+			
+			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
 			if (target.isDisoriented) difficulty -= 2; //Lower the difficulty if the target is dizzy.
+			if (target.isFocused ) difficulty += 2; // Up the difficulty if the target is focused
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
 
 			var critCheck = true;
@@ -785,7 +798,7 @@ $(document).ready(function () {
 				difficulty += 4; // Too tired? You're likely to miss.
 				windowController.addHint( attacker.name + " did not have enough stamina, and took penalties to the attack." );
 			}
-			attacker.hitStamina (20); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount. (We'll hit the attacker up for the rest on a miss or a dodge).
+			//attacker.hitStamina (20); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount. (We'll hit the attacker up for the rest on a miss or a dodge).
 			
 			if ( attacker.isEvading || target.isEvading ) {
 				windowController.addHit( target.name + " IS TOO FAR AWAY! " );
@@ -797,14 +810,18 @@ $(document).ready(function () {
 			if ( roll <= attackTable.miss ) {	//Miss-- no effect.
 				windowController.addHit( " FAILED! " );
 				windowController.addHint( attacker.name + " failed to establish a hold!" );
-				attacker.hitStamina (15);
+				attacker.hitStamina ( requiredStam - (attacker.intellect() * 2) );
+				
+				//attacker.hitStamina (15);
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
 			if( roll <= attackTable.dodge && target.canDodge(attacker)  ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " was too fast, and escaped before " + attacker.name + " could establish a hold.");
-				attacker.hitStamina (15);
+				attacker.hitStamina ( requiredStam - (attacker.intellect() * 2) );
+				
+				//attacker.hitStamina (15);
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
@@ -818,7 +835,7 @@ $(document).ready(function () {
 						
 			if ( attacker.isGrappling( target ) ) { 
 				windowController.addHit( " SUBMISSION " );
-				damage += attacker.strength()*2;				
+				damage += attacker.strength()*2;								
 				target.isDisoriented += 2; //Submission moves disorient the target. 
 				if (target.isGrappling( attacker )){
 					attacker.removeGrappler( target );
@@ -833,6 +850,8 @@ $(document).ready(function () {
 			}						
 
 			//Deal all the actual damage/effects here.
+			attacker.hitStamina ( requiredStam - 15 ); //Successful grab attacks have the cost reduced
+			
 			damage += baseDamage;
 			damage = Math.max(damage, 1);
 			target.hitHp(damage);
@@ -868,16 +887,17 @@ $(document).ready(function () {
 			var stamDamage = 30;
 			var requiredStam = 40;
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
-		
+
+			if (attacker.isRestrained) difficulty += Math.max(0, 4 + Math.floor((target.strength() - attacker.strength()) / 2)); //When grappled, up the difficulty based on the relative strength of the combatants. Minimum of +0 difficulty, maximum of +8.
+			if (target.isRestrained) difficulty -= 4; //Lower the difficulty considerably if the target is restrained.
+			
 			if (attacker.isDisoriented) difficulty += 1; //Up the difficulty if the attacker is dizzy.
-			if (attacker.isRestrained) difficulty += 8; //Up the difficulty massively if the attacker is restrained.			
 			if (target.isEvading) difficulty += 4; //Increase the difficulty if the target is not in melee, but don't make it impossible.
 			if (target.isFocused ) difficulty += 2;
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
-			if (target.isRestrained) difficulty -= 4; //Lower the difficulty if the target is restrained.
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
 
-			if (target.isEvading) requiredStam += 20; //Increase the stamina cost if the target is not in melee
+			// if (target.isEvading) requiredStam += 20; //Increase the stamina cost if the target is not in melee
 
 			var critCheck = true;
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
@@ -888,27 +908,32 @@ $(document).ready(function () {
 				difficulty += 4; // Too tired? You're likely to miss.
 				windowController.addHint( attacker.name + " did not have enough stamina, and took penalties to the attack." );
 			}
-			attacker.hitStamina (requiredStam - 20); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount. (We'll hit the attacker up for the rest on a miss or a dodge).
+			// attacker.hitStamina (requiredStam - 20); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount. (We'll hit the attacker up for the rest on a miss or a dodge).
 
+			if (target.isEvading) attacker.hitStamina ( 10 );
 
 			var attackTable = attacker.buildActionTable( difficulty, target.dexterity(), attacker.dexterity(), attacker.dexterity() );
 			
 			if ( roll <= attackTable.miss ) {	//Miss-- no effect.
 				windowController.addHit( " MISS! " );
-				attacker.hitStamina (20);
+				
+				attacker.hitStamina ( requiredStam - (attacker.intellect() * 2) );
+				//attacker.hitStamina (20);
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
 			if( roll <= attackTable.dodge && target.canDodge(attacker) ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
-				attacker.hitStamina (20);
+				
+				attacker.hitStamina ( requiredStam - (attacker.intellect() * 2) );
+				//attacker.hitStamina (20);
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
 			if ( roll <= attackTable.glancing && target.canDodge(attacker) ) { //Glancing blow-- reduced damage/effect, typically half normal.
 				windowController.addHint( target.name + " rolled with the blow. They are still stunned, but lost less stamina. " );
-				stamDamage -= 20;
+				stamDamage -= 10;
 			} else if ( roll >= attackTable.crit && critCheck == true) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
 				windowController.addHint( "Critical Hit! " + attacker.name + " really drove that one home!" );				
 				damage *= 2;
@@ -941,6 +966,9 @@ $(document).ready(function () {
 			}					
 
 			//Deal all the actual damage/effects here.
+			
+			attacker.hitStamina ( requiredStam - 20 ); //Successful tackle attacks have the cost reduced
+			
 			damage += baseDamage;
 			damage = Math.max(damage, 1);
 			stamDamage = Math.max(stamDamage, 1);			
@@ -974,18 +1002,20 @@ $(document).ready(function () {
 				difficulty += 4; // Too tired? You're likely to miss.
 				windowController.addHint( attacker.name + " did not have enough stamina, and took penalties to the attack." );			
 			}			
-			attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
+			// attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
 			
 			var attackTable = attacker.buildActionTable( difficulty, target.dexterity(), attacker.dexterity(), attacker.dexterity() );
 			
 			if ( roll <= attackTable.miss ) {	//Miss-- no effect.
 				windowController.addHit( " MISS! " );
+				attacker.hitStamina (requiredStam - 5); 
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
 			if( roll <= attackTable.dodge && target.canDodge(attacker)  ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
+				attacker.hitStamina (requiredStam - 5); 
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
@@ -1002,6 +1032,8 @@ $(document).ready(function () {
 			}
 			
 			//Deal all the actual damage/effects here.
+
+			attacker.hitStamina (requiredStam);			
 			damage += baseDamage;
 			damage = Math.max(damage, 1);			
 			target.hitHp(damage);
@@ -1017,11 +1049,12 @@ $(document).ready(function () {
 			var requiredMana = 24;
 			var difficulty = 8; //Base difficulty, rolls greater than this amount will hit.
 		
+			if (attacker.isRestrained) difficulty += Math.max(2, 4 + Math.floor((target.strength() - attacker.strength()) / 2)); //When grappled, up the difficulty based on the relative strength of the combatants. Minimum of +2 difficulty, maximum of +8.
+			if (target.isRestrained) difficulty -= 2; //Lower the difficulty considerably if the target is restrained.
+			
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
-			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if the attacker is restrained.
 			if (target.isFocused ) difficulty += 2;
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
-			if (target.isRestrained) difficulty -= 2; //Lower the difficulty slightly if the target is restrained.
 			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused
 	
 			var critCheck = true;
@@ -1032,18 +1065,20 @@ $(document).ready(function () {
 				difficulty += 4; // Too tired? You're likely to have your spell fizzle.
 				windowController.addHint( attacker.name + " did not have enough mana, and took penalties to the attack." );			
 			}			
-			attacker.hitMana (requiredMana /2); //Now that required mana has been checked, reduce the attacker's mana by the appopriate amount. (We'll get the rest if the attack succeeds)
+			// attacker.hitMana (requiredMana); //Now that required mana has been checked, reduce the attacker's mana by the appopriate amount. 
 			
 			var attackTable = attacker.buildActionTable( difficulty, target.dexterity(), attacker.dexterity(), attacker.intellect() );
 			
 			if ( roll <= attackTable.miss ) {	//Miss-- no effect.
 				windowController.addHit( " FAILED! " );
+				attacker.hitMana (requiredMana - 6); 
 				return 0; //Failed attack, if we ever need to check that.
 			}
 			
 			if( roll <= attackTable.dodge && target.canDodge(attacker)  ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
+				attacker.hitMana (requiredMana - 6); 
 				return 0; //Failed attack, if we ever need to check that.
 			}	
 
@@ -1061,9 +1096,10 @@ $(document).ready(function () {
 				windowController.addHit( "MAGIC HIT! " );
 			}			
 			
-			attacker.hitMana (requiredMana /2); 
-			
 			//Deal all the actual damage/effects here.
+			
+			attacker.hitMana (requiredMana); 
+			
 			damage += baseDamage;
 			damage = Math.max(damage, 1);			
 			target.hitHp(damage);
@@ -1163,12 +1199,13 @@ $(document).ready(function () {
 				attacker.isEvading = false; //If you are already evading melee, this will let you stop it without stamina cost or a roll for success.
 				return 1;
 			}
-			
-			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
-			if (attacker.isRestrained) difficulty += 4; //Up the difficulty considerably if the attacker is restrained.
-			if (target.isDisoriented) difficulty -= 2; //Lower the difficulty if the attacker is dizzy.
+						
+			if (attacker.isRestrained) difficulty += Math.max(0, 2 + Math.floor((target.strength() - attacker.strength()) / 2)); //When grappled, up the difficulty based on the relative strength of the combatants. Minimum of +0 difficulty, maximum of +6.
 			if (target.isRestrained) difficulty -= 4; //Lower the difficulty considerably if the target is restrained.
 			
+			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
+			if (target.isDisoriented) difficulty -= 2; //Lower the difficulty if the attacker is dizzy.
+				
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
 				difficulty += 20; // Too tired? You're going to fail.
 				windowController.addHint( attacker.name + " was just too tired." );			
@@ -1236,25 +1273,25 @@ $(document).ready(function () {
 			switch (action) 
 			{
 			case "Light":
-				attacker.hitStamina(10);
+				attacker.hitStamina(20 - (attacker.intellect() * 2));
 				break;
 			case "Heavy":
-				attacker.hitStamina(25);
+				attacker.hitStamina(35 - (attacker.intellect() * 2));
 				break;
 			case "Grab":
-				attacker.hitStamina(30);
+				attacker.hitStamina(25 - (attacker.intellect() * 2));
 				break;
 			case "Tackle":
-				attacker.hitStamina(30);
+				attacker.hitStamina(30 - (attacker.intellect() * 2));
 				break;
 			case "Ranged":
-				attacker.hitStamina(5);
+				attacker.hitStamina(15);
 				break;
 			case "Magic":
-				attacker.hitMana(10);
+				attacker.hitMana(18);
 				break;
 			case "Escape":
-				attacker.hitStamina(10);
+				attacker.hitStamina(20);
 				break;
 			case "Skip/Rest":
 				windowController.addHint( attacker.name + " could not calm their nerves." );

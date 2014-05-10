@@ -13,6 +13,15 @@
  - Stage specific hazards/bonuses?
 
 -----------  Patch Notes  -----------------
+v.0.9.5.6 (May 8th, 2014):
+  - The difficulty of escaping a grapple, throwing someone when grappling, using magic while grappled, and using submission moves are all now affected by the relative strength scores of the combatants. 
+  - Misses, dodges, and fumbles on Light Attacks, Heavy Attacks, Grabs, and Tackles will now cost between 2 and 20 stamina less than the full normal cost, based on your Intellect score. Note that the 'full cost' for Grabs and Tackles is 35 or 40, respectively, though the actual amount you pay for either is often reduced.
+  - Misses, dodges, and fumbles on Magic attacks and Ranged attacks cost more than they did before, but still cost less than the full amount. (15 stamina for Ranged attacks, and 18 mana for Magic).
+  - The added stamina cost on Tackle for charging an opponent has been reduced from 20 to 10. This cost also no longer factors into the "insufficient stamina" penalty check.
+  - The amount of stamina damage you deal to an opponent with Tackle on a glancing blow has been increased from 10 to 20.
+  
+  Together these changes should (hopefully) make Intellect more valuable for non-mages, make Strength more valuable for those who want to grapple or want to avoid being grappled, make Tackle more valuable in general... as it was suffering too badly from its relatively high stamina cost, given it's likely effects, and put the efficiency of Magic attacks and Ranged attacks more on par with the efficiency of physical attacks.
+
 v.0.9.5.5 (May 3rd, 2014):
   - The cost of magic has gone back up, slightly, to 24 mana and the accuracy has been slightly reduced (Magic is now on par with a heavy attack in terms of accuracy). Mana gained/Stamina lost from Channel has also been increased by a similar degree.
   - The cost of ranged attacks has increased to 20 stamina, and their accuracy has been reduced. When aiming/focused it should still hit reliably, but not ~100% of the time unless you also have a very significant advantage in Dexterity. Both of these changes may be superseded at some point by other, more in depth changes to ranged attacks, at which point they will return to their original stamina cost and accuracy.
