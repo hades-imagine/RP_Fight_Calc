@@ -1,25 +1,30 @@
 fieldset {
 	padding: 0.5em;
-	background-color:#fafafa;
+	background-color:#2a2a2a;
 	border: none;
 }
-	
+
+input {
+	background-color: #777;
+	border-color: #333;
+}
+
 legend {
 	margin: 0px -0.5em;
 	padding: 0.2em 0.5em;
-	background-color:#f0f0f0;
+	background-color:#202020;
 	width: 100%;
 }
-	
+
 .StatBlock > label {
 	display:inline-block;
-	width: 6em;		
+	width: 6em;
 }
 
 .FormContainer {
 	display: inline-block;
 	border: none;
-	width: 20em;
+	width: 22em;
 }
 
 .WideFormContainer {
@@ -83,16 +88,16 @@ td.FullHeightCell {
 
 .RadioList input[type=radio],
 .RadioWide input[type=radio] {
-	display:none; 
+	display:none;
 }
-	
+
 .RadioList input[type=radio] + label {
 	display:inline-block;
 	width: 100%;
 	margin: 0px -0.5em;
 	padding: 4px 0.5em;
 }
-	
+
 .RadioWide input[type=radio] + label {
 	display:inline-block;
 	width: 1em;
@@ -102,12 +107,12 @@ td.FullHeightCell {
 }
 
 .RadioWide input[type=radio]:hover + label,
-.RadioList input[type=radio]:hover + label { 
+.RadioList input[type=radio]:hover + label {
 	background-color:#fff0b0;
 }
 
 .RadioWide input[type=radio]:checked + label,
-.RadioList input[type=radio]:checked + label { 
+.RadioList input[type=radio]:checked + label {
 	background-color:#f0e0a0;
 }
 
