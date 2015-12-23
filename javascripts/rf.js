@@ -49,18 +49,78 @@ $(document).ready(function () {
 	var races = [
 		{
 			name: "Human",
+			stages: {
+				"Swamp":{
+					strength: -1,
+					endurance: -1,
+					luck: -2,
+				},
+				"Dark Cave":{
+					dexterity: -1,
+					willpower: -1,
+				},
+			},
 		},
 		{
 			name: "Animal",
+			stages: {
+				"Swamp":{
+					strength: -1,
+					endurance: -1,
+					luck: -1,
+				},
+			},
+		},
+		{
+			name: "Bog Monster",
+			stages: {
+				"Swamp":{
+					isFirst: true,
+					strength: 1,
+					endurance: 2,
+					luck: 2,
+				},
+			},
 		},
 		{
 			name: "Elf",
+			stages: {
+				"Swamp":{
+					strength: -1,
+					endurance: -1,
+					luck: -2,
+				},
+				"Dark Cave":{
+					dexterity: -1,
+				},
+			},
 		},
 		{
 			name: "Orc",
+			stages: {
+				"Swamp":{
+					strength: -1,
+					endurance: -1,
+					luck: -2,
+				},
+				"Dark Cave":{
+					dexterity: 1,
+					willpower: 1,
+				},
+			},
 		},
 		{
 			name: "Other Monster",
+			stages: {
+				"Swamp":{
+					endurance: -1,
+					luck: -1,
+				},
+				"Dark Cave":{
+					dexterity: 2,
+					willpower: 2,
+				},
+			},
 		},
 	]
 
@@ -68,7 +128,7 @@ $(document).ready(function () {
 	var windowController = {
 		_tagParser : new BBParser(),
 		_rollovers : {
-			"Race" : "Race. <br /> Currently races are purely cosmetic, with no effect.",
+			"Race" : "Race. <br /> Some races has stats advantage on specific stages. E.g. bog monster has a big bonus when on swamp, while most of others are penalised by few points.",
 			"Strength" : "Strength. <br /> This is your base damage stat; the higher this is, the higher your basic attacks will be. This affects all attacks besides ranged attacks and magic.",
 			"Dexterity" : "Dexterity. <br /> This is your accuracy and dodge stat; the higher this is, the more likely you will be able to dodge attacks or reduce their effects, or strike with more precision on your own.",
 			"Endurance" : "Endurance. <br /> This is your basic defense stat; the higher this is the more health you will have and the faster your stamina will refill over time.",
@@ -94,7 +154,8 @@ $(document).ready(function () {
 			"Rest" : "Rest (Free) <br />Restores stamina. <br /> Endurance affects stamina regained. <br />Wisdom affects the likelihood of successfully resting in stressful conditions.",
 			"Channel" : "Channel (Free) <br />Restores mana at the cost of stamina. <br /> Willpower affects the amount of stamina converted into mana, and affects the likelihood of successfully channeling in stressful conditions.",
 			"Focus" : "Focus/Aim (Free) <br />Increases concentration. Makes you slightly harder to hit, and considerably improves your accuracy. <br /> Willpower affects how much damage you may take before your focus/aim is lost, and affects the likelihood of successfully focusing/aiming in stressful conditions.",
-			"Move" : "Escape/Pursue (20 stamina) <br />If you are being grappled, Escape/Pursue will let you attempt to break free. When you are not grappling, escape will open up some distance between you and your opponent, forcing them to pursue you or try to tackle you if they want to use melee attacks. When your opponent is at a distance, Escape/Pursue will let you pursue them, trying to force them back into melee.."
+			"Move" : "Escape/Pursue (20 stamina) <br />If you are being grappled, Escape/Pursue will let you attempt to break free. When you are not grappling, escape will open up some distance between you and your opponent, forcing them to pursue you or try to tackle you if they want to use melee attacks. When your opponent is at a distance, Escape/Pursue will let you pursue them, trying to force them back into melee..",
+			"StageSelect":"Place of the fight<br />Some places can change player's stats. For example when fighting in a swamp, some player races are fatigued..."
 		},
 		getRolloverKeys : function () {
 			var keys = [];
@@ -331,7 +392,23 @@ $(document).ready(function () {
 		},
 
 		pickInitialActor : function () {
-			this._currentFighter = Math.floor(Math.random() * this._fighters.length);
+			// first prioritize hard-coded priority for specific stage
+			var priority = []
+			for (var i=0;i<this._fighters.length; i++){
+				fighter = this._fighters[i]
+				try{
+					if(races[fighter._race].stages[this.stage].isFirst == true){
+						priority.push(i)
+					}
+				}catch(e){}
+			}
+			// if there is just one player with priority on the stage, let him go
+			// otherwise continue as usual
+			if(priority.length == 1){
+					this._currentFighter = priority[0]
+			}else{
+				this._currentFighter = Math.floor(Math.random() * this._fighters.length);
+			}
 			windowController.setActionButton( this._fighters[this._currentFighter].name );
 		},
 
@@ -367,12 +444,33 @@ $(document).ready(function () {
 		}
 	};
 
+	// compute effects of race and stage
+	// don't allow to get bellow 1, unless player set it to 0
+	function addEffect(race, key, current){
+		var effects=races[race].stages[battlefield.stage]
+			if (effects == undefined || effects[key] == undefined){
+				return current;
+			}
+			var val = current + effects[key];
+			if (val < 1){
+				if (current == 0){
+					return 0
+				}else {
+					return 1;
+				}
+			}
+			return val;
+	}
+
 	// Fighter : The fighter class stores the information specific to each fighter (name, hit points, etc.), and provides functions for handling attacks and effects like the end of turn regeneration/upkeep.
 	// The fighter class also provides accessors for the character attributes and damage functions, so that it's easier to implement/change things like the game speed setting, or the effects of being stunned.
 	function fighter(settings, globalSettings){
 		if (!(this instanceof fighter)) return new fighter(settings); //protection against calling this as a function rather than instantiating it with new.
 		var errors = [];
 		this.name = settings.Name;
+
+
+
 
 		//Check numeric fields for invalid values
 		var nonNumericFields = ["Name"];
@@ -391,6 +489,8 @@ $(document).ready(function () {
 		this._willpower = (+settings.Willpower);
 		this._luck = (+settings.Luck);
 
+
+
 		this._dizzyValue = Math.max(globalSettings.DisorientedAt - (this._willpower * 2), 0);
 		this._koValue = Math.max(globalSettings.UnconsciousAt - (this._willpower * 2), 0);
 		this._deathValue = globalSettings.DeadAt;
@@ -405,11 +505,16 @@ $(document).ready(function () {
 
 		var stattotal = this._strength + this._dexterity + this._endurance +  this._intellect +  this._willpower + this._luck;
 		if ( stattotal!= globalSettings.StatPoints && globalSettings.StatPoints != 0 )  errors.push( settings.Name + " has stats that are too high or too low (" + stattotal + " out of " + globalSettings.StatPoints + " points spent).");
-
 		if ( errors.length ) {
 			for (var i = 0, len = errors.length; i < len; i++) windowController.addError( errors[i] );
 			throw new Error( settings.Name + " was not created due to invalid settings." );
 		}
+		this._strength = addEffect(this._race, "strength",this._strength);
+		this._dexterity = addEffect(this._race, "dexterity",this._dexterity);
+		this._endurance = addEffect(this._race, "endurance",this._endurance);
+		this._intellect = addEffect(this._race, "intellect",this._intellect);
+		this._willpower = addEffect(this._race, "willpower",this._willpower);
+		this._luck = addEffect(this._race, "luck",this._luck);
 
 		this._maxHP = 60 + this._endurance * 10;
 		this._maxMana = this._willpower * 10;
@@ -595,7 +700,7 @@ $(document).ready(function () {
 		},
 
 		getStatBlock : function () {
-			return "[color=cyan]" + this.name + " stats: Strength:" + this.strength() + " Dexterity:" + this.dexterity() + " Endurance:" + this.endurance() + " Intellect:" + this.intellect() + " Willpower:" + this.willpower() + "[/color]";
+			return "[color=cyan]" + this.name + " stats: Strength:" + this.strength() + " Dexterity:" + this.dexterity() + " Endurance:" + this.endurance() + " Intellect:" + this.intellect() + " Willpower:" + this.willpower() + " Luck:" + this.luck() + "[/color]";
 		},
 
 		getStatus : function () {

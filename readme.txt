@@ -1,13 +1,13 @@
 -----------  Ideas  -----------------
-  - Make stages important - change stats of players?
-  - Player races could be useful together with important stages.
+  - More stages and races?
 
 -----------  Patch Notes  -----------------
 v.0.9.6 (Dec 23th, 2015)
   - Forked by Hades
   - Changed page visuals
   - Added luck stat. Luck affects every roll.
-  - Added player races (no effect now)
+  - Added player races (changes stats on some stages)
+  - Add effects for stages
 
 v.0.9.5.6 (May 8th, 2014):
   - The difficulty of escaping a grapple, throwing someone when grappling, using magic while grappled, and using submission moves are all now affected by the relative strength scores of the combatants.
