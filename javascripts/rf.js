@@ -1,12 +1,12 @@
 //----------------------------------------------------------------------------------
 // All the Rendezvous Fight specific code can be found in the $(document).ready function below.
-//----------------------------------------------------------------------------------	
+//----------------------------------------------------------------------------------
 
 $(document).ready(function () {
 	//----------------------------------------------------------------------------------
 	// Functions and classes
-	//----------------------------------------------------------------------------------	
-	
+	//----------------------------------------------------------------------------------
+
 	// Pass rollDice an array of integers, get back a result as if each of those numbers were a die with that many sides.
 	// For example, rollDice ( [6,6,6] ) would return the result of a 3d6 roll, and rollDice([20]) would return the result of a 1d20 roll.
 	function rollDice( dice ) {
@@ -28,7 +28,7 @@ $(document).ready(function () {
 		return Math.max(min, Math.min(n, max));
 	};
 
-	//windowController is a collection of functions and message strings used to control what is actually output to the page. It doesn't need to be instantiated, it's not a class... just a handy way of collecting related items and referencing things.	
+	//windowController is a collection of functions and message strings used to control what is actually output to the page. It doesn't need to be instantiated, it's not a class... just a handy way of collecting related items and referencing things.
 	var windowController = {
 		_rollovers : {
 			"Strength" : "Strength. <br /> This is your base damage stat; the higher this is, the higher your basic attacks will be. This affects all attacks besides ranged attacks and magic.",
@@ -97,17 +97,17 @@ $(document).ready(function () {
 			if( this._windowPanels.filter( "#" + targetID ).length ) return 1;
 			return 0;
 		},
-		
+
 		_updatePanel : function() {
 			if (this._activePanel === "") this._activePanel = this._windowPanels.first().attr("id");
-			
+
 			if ( !this._verifyPanelExists(this._activePanel) ) {
 				console.log( "windowController._updatePanel: _activePanel has been set to an invalid value. No panel with ID (#" + this._activePanel + ") exists." );
 				return;
 			}
 
 			this._windowPanels.find(":input").attr("checked", false);
-			
+
 			var targetPanel = $("#" + this._activePanel);
 			if( targetPanel.is(':visible') ) {
 				this._windowPanels.not( targetPanel ).hide()
@@ -123,78 +123,78 @@ $(document).ready(function () {
 				});
 			}
 		},
-	
-		switchToPanel : function( targetID ) { 
+
+		switchToPanel : function( targetID ) {
 			if ( !this._verifyPanelExists( targetID ) ) {
 				console.log( "windowController.switchToPanel: No panel with ID (#" + targetID + ") exists." );
 				return;
 			}
-			
+
 			this._activePanel = targetID;
-			this._updatePanel();			
+			this._updatePanel();
 		},
-		
-		nextPanel : function() { 
+
+		nextPanel : function() {
 			if (this._activePanel === "") {
 				this._activePanel = this._windowPanels.first().attr("id");
 				return;
 			}
-			
+
 			if ( !this._verifyPanelExists(this._activePanel) ) {
 				console.log( "windowController.nextPanel: _activePanel has been set to an invalid value. No panel with ID (#" + this._activePanel + ") exists." );
 				return;
 			}
-			
+
 			var targetPanel = this._windowPanels.siblings( "#" + this._activePanel ).next().attr("id");
-		
+
 			if (typeof targetPanel !== "undefined" ) {
 				this._activePanel = targetPanel;
 			} else {
 				this._activePanel = this._windowPanels.first().attr("id"); //If already on last panel, loop around to first
 			}
-			
+
 			this._updatePanel();
 		},
-		
-		prevPanel : function() { 
+
+		prevPanel : function() {
 			if (this._activePanel === "") {
 				this._activePanel = this._windowPanels.last().attr("id");
 				return;
 			}
-			
+
 			if ( !this._verifyPanelExists(this._activePanel) ) {
 				console.log( "windowController.prevPanel: _activePanel has been set to an invalid value. No panel with ID (#" + this._activePanel + ") exists." );
 				return;
 			}
-			
+
 			var targetPanel = this._windowPanels.siblings( "#" + this._activePanel ).prev().attr("id");
 			if (typeof targetPanel !== "undefined" ) {
 				this._activePanel = targetPanel;
 			} else {
 				this._activePanel = this._windowPanels.last().attr("id"); //If already on first panel, loop around to last
-			}	
-			
+			}
+
 			this._updatePanel();
 		},
-		
+
 		updateOutput: function() {
 			var lines = [""];
 			if( this.messages.action.length ) lines[0] += this._formatMessage.action( this.messages.action.join(" ") );
 			if( this.messages.damage != 0 ) lines[0] += this._formatMessage.damage( this.messages.damage );
 			if( lines[0] == "" ) lines = [];
-			
+
 			if( this.messages.hit.length ) lines.push( this._formatMessage.hit( this.messages.hit.join("\n") ));
 			if( this.messages.status.length ) lines.push( this.messages.status.join("\n") );
-			if( this.messages.hint.length ) lines.push( this._formatMessage.hint( this.messages.hint.join("\n") ));			
+			if( this.messages.hint.length ) lines.push( this._formatMessage.hint( this.messages.hint.join("\n") ));
 			if( this.messages.special.length ) lines.push( this._formatMessage.special( this.messages.special.join("\n") ));
 			if( this.messages.info.length ) lines.push( "\n" + this.messages.info.join("\n") );
 			$( "#CombatResult" ).html( lines.join("\n"));
 
 			var tagParser = new BBParser();
 			$( "#ParsedOutput" ).html( tagParser.parseContent( $( "#CombatResult" ).html().replace(/\n/g, '<br />') ));
-			
+
 			$( "#ErrorMessage" ).empty();
-			if( this.messages.error.length ) $( "#ErrorMessage" ).append( this.messages.error.join("<br />") );		
+			if( this.messages.error.length ) $( "#ErrorMessage" ).append( this.messages.error.join("<br />") );
 
 			//clear messages from the queue once they have been displayed
 			this.messages = {
@@ -208,11 +208,11 @@ $(document).ready(function () {
 				error : []
 			}
 		},
-		
+
 		setActionButton : function ( name ) {
 			$("#Take_Action").val( "Take action as " + name );
 		},
-		
+
 		addAction : function( line ) { if( typeof line === "string" ) this.messages.action.push(line); },
 		addHit : function( line ) { if( typeof line === "string" ) this.messages.hit.push(line); },
 		addStatus : function( line ) { if( typeof line === "string" ) this.messages.status.push(line); },
@@ -227,7 +227,7 @@ $(document).ready(function () {
 			$(target).siblings("input[name=HP]").val(hp);
 			$(target).siblings("span[name=maxHP]").html(hp);
 		},
-		
+
 		calcFormMana : function ( target ) {
 			var mana = 0;
 			if( parseInt(target.value) == target.value ) mana = (target.value * 10);
@@ -235,18 +235,18 @@ $(document).ready(function () {
 			$(target).siblings("span[name=maxMana]").html(mana);
 		}
 	};
-	
+
 	// Arena : The Arena class determines the stage, stores the global settings like gameSpeed, collects the fighters involved in a combat, and tracks things like which fighter's turn it currently is.
 	function arena(){
 		if (!(this instanceof arena)) return new arena(); //protection against calling this as a function rather than instantiating it with new.
-		this._fighters = [];	
+		this._fighters = [];
 		this._currentFighter;
 		this.stage = this.pickStage();
-		
+
 		//Set default values for global settings
 		this._globalFighterSettings = { "GameSpeed" : 1, "StatPoints" : 20, "DeadAt" : 0, "UnconsciousAt" : 25, "DisorientedAt" : 40 };
 	};
-	
+
 	arena.prototype = {
 		setGlobalFighterSettings : function ( settings ) {
 			if(parseInt( settings.StatPoints ) == settings.StatPoints ) this._globalFighterSettings.StatPoints = settings.StatPoints;
@@ -255,41 +255,41 @@ $(document).ready(function () {
 			if(parseInt( settings.DisorientedAt ) == settings.DisorientedAt ) this._globalFighterSettings.DisorientedAt = Math.max(settings.DisorientedAt,  this._globalFighterSettings.UnconsciousAt);
 			if( !(isNaN(settings.GameSpeed)) ) this._globalFighterSettings.GameSpeed = settings.GameSpeed;
 		},
-		
+
 		addFighter : function ( settings ) {
 			try {
-				this._fighters.push( new fighter(settings, this._globalFighterSettings) ); 
+				this._fighters.push( new fighter(settings, this._globalFighterSettings) );
 			} catch(err) {
 				console.log(err.message);
 				return 0;
 			}
-			
+
 			return 1;
 		},
-		
+
 		clearFighters : function () {
 			this._fighters = [];
 		},
-		
+
 		getActor : function () {
 			return this._fighters[ this._currentFighter ];
 		},
-		
+
 		getTarget : function () {
 			return this._fighters[ 1 - this._currentFighter ]; //Just a placeholder in case I add actual targeting of attacks and group fights later
 		},
-		
+
 		outputFighterStatus : function () {
 			for (var i = 0, len = this._fighters.length; i < len; i++) windowController.addStatus( this._fighters[i].getStatus() );
 		},
-		
+
 		outputFighterStats : function () {
 			for (var i = 0, len = this._fighters.length; i < len; i++) windowController.addStatus( this._fighters[i].getStatBlock() );
 		},
-		
+
 		nextFighter : function () {
 			this._currentFighter = (this._currentFighter == this._fighters.length - 1) ? 0 : this._currentFighter + 1;
-			
+
 			if( this._fighters[this._currentFighter].isStunned ) {
 				this._fighters[this._currentFighter].isStunned = false;
 				this.nextFighter();
@@ -297,33 +297,33 @@ $(document).ready(function () {
 				windowController.setActionButton( this._fighters[this._currentFighter].name );
 			}
 		},
-		
+
 		pickInitialActor : function () {
 			this._currentFighter = Math.floor(Math.random() * this._fighters.length);
 			windowController.setActionButton( this._fighters[this._currentFighter].name );
 		},
-		
+
 		pickStage : function() {
 			var stages = [
-				"The Pit", 
-				"RF:Wrestling Ring", 
-				"Arena", 
-				"Subway", 
-				"Skyscraper Roof", 
-				"Forest", 
-				"Cafe", 
-				"Street road", 
-				"Alley", 
-				"Park", 
-				"RF:MMA Hexagonal Cage", 
-				"Hangar", 
-				"Swamp", 
-				"RF:Glass Box", 
+				"The Pit",
+				"RF:Wrestling Ring",
+				"Arena",
+				"Subway",
+				"Skyscraper Roof",
+				"Forest",
+				"Cafe",
+				"Street road",
+				"Alley",
+				"Park",
+				"RF:MMA Hexagonal Cage",
+				"Hangar",
+				"Swamp",
+				"RF:Glass Box",
 				"RF:Free Space" ];
-			
+
 			return stages[Math.floor(Math.random() * stages.length)];
-		}, 
-		
+		},
+
 		turnUpkeep : function () {
 			for (var i = 0, len = this._fighters.length; i < len; i++) {
 				this._fighters[i].updateCondition();
@@ -340,13 +340,13 @@ $(document).ready(function () {
 		if (!(this instanceof fighter)) return new fighter(settings); //protection against calling this as a function rather than instantiating it with new.
 		var errors = [];
 		this.name = settings.Name;
-	
+
 		//Check numeric fields for invalid values
 		var nonNumericFields = ["Name"];
-		$.each(settings, function(key, value) {				
+		$.each(settings, function(key, value) {
 			if ((jQuery.inArray( key, nonNumericFields ) == -1) && (parseInt(value) != value)) errors.push( settings.Name + " settings are invalid: " + key + " cannot have a value of " + value + "." );
 		});
-		
+
 		//Set stats from settings
 		this._strength = (+settings.Strength);
 		this._dexterity = (+settings.Dexterity);
@@ -357,52 +357,52 @@ $(document).ready(function () {
 		this._dizzyValue = globalSettings.DisorientedAt;
 		this._koValue = globalSettings.UnconsciousAt;
 		this._deathValue = globalSettings.DeadAt;
-		
+
 		//Check stat points for conformity to rules
-		if (this._strength > 10  || this._strength < 1) errors.push( settings.Name + "'s Strength is outside the allowed range (1 to 10).");		
-		if (this._dexterity > 10 || this._dexterity < 1) errors.push( settings.Name + "'s Dexterity is outside the allowed range (1 to 10).");		
-		if (this._endurance > 10 || this._endurance < 1) errors.push( settings.Name + "'s Endurance is outside the allowed range (1 to 10).");		
-		if (this._intellect > 10 || this._intellect < 1) errors.push( settings.Name + "'s Intellect is outside the allowed range (1 to 10).");		
-		if (this._willpower > 10 || this._willpower < 1) errors.push( settings.Name + "'s Willpower is outside the allowed range (1 to 10).");		
-		
+		if (this._strength > 10  || this._strength < 1) errors.push( settings.Name + "'s Strength is outside the allowed range (1 to 10).");
+		if (this._dexterity > 10 || this._dexterity < 0) errors.push( settings.Name + "'s Dexterity is outside the allowed range (0 to 10).");
+		if (this._endurance > 10 || this._endurance < 0) errors.push( settings.Name + "'s Endurance is outside the allowed range (0 to 10).");
+		if (this._intellect > 10 || this._intellect < 0) errors.push( settings.Name + "'s Intellect is outside the allowed range (0 to 10).");
+		if (this._willpower > 10 || this._willpower < 0) errors.push( settings.Name + "'s Willpower is outside the allowed range (0 to 10).");		
+
 		var stattotal = this._strength + this._dexterity + this._endurance +  this._intellect +  this._willpower;
-		if ( stattotal!= globalSettings.StatPoints && globalSettings.StatPoints != 0 )  errors.push( settings.Name + " has stats that are too high or too low (" + stattotal + " out of " + globalSettings.StatPoints + " points spent).");		
+		if ( stattotal!= globalSettings.StatPoints && globalSettings.StatPoints != 0 )  errors.push( settings.Name + " has stats that are too high or too low (" + stattotal + " out of " + globalSettings.StatPoints + " points spent).");
 
 		if ( errors.length ) {
 			for (var i = 0, len = errors.length; i < len; i++) windowController.addError( errors[i] );
 			throw new Error( settings.Name + " was not created due to invalid settings." );
 		}
-		
+
 		this._maxHP = 60 + this._endurance * 10;
 		this._maxMana = this._intellect * 10;
 		this._maxStamina = 100;
-	
+
 		this._damageEffectMult = globalSettings.GameSpeed;
-		
+
 		this.hp = 0;
 		this.addHp( settings.HP );
-		
+
 		this.mana = 0;
 		this.addMana( settings.Mana );
-		
+
 		this.stamina = 0;
 		this.addStamina( settings.Stamina );
-		
+
 		this.cloth = 0;
 		this.addCloth( settings.Cloth );
-		
+
 		this.isUnconscious = false;
 		this.isDead = false;
 		this.isRestrained = false;
 		this.isStunned = false;
 		this.isDisoriented = 0;
-		this.isGrappledBy = []; 		
+		this.isGrappledBy = [];
 		this.isFocused = 0;
 		this.isInMelee = true;
 	};
-	
+
 	fighter.prototype = {
-		strength : function () { 
+		strength : function () {
 			var total = this._strength;
 			total -= this.isDisoriented;
 			if (this.isRestrained) total = total / 2;
@@ -410,61 +410,61 @@ $(document).ready(function () {
 			total = Math.ceil(total);
 			return total;
 		},
-		
-		dexterity : function () { 
-			var total = this._dexterity; 
+
+		dexterity : function () {
+			var total = this._dexterity;
 			total -= this.isDisoriented;
 			if (this.isRestrained) total = total / 2;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
 			return total;
 		},
-		
-		endurance : function () { 
+
+		endurance : function () {
 			var total = this._endurance;
 			total -= this.isDisoriented;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
 			return total;
 		},
-		
-		intellect : function () { 
+
+		intellect : function () {
 			var total = this._intellect;
 			total -= this.isDisoriented;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
 			return total;
 		},
-		
-		willpower : function () { 
+
+		willpower : function () {
 			var total = this._willpower;
 			total -= this.isDisoriented;
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
 			return total;
 		},
-		
-		addHp : function ( n ) { 
+
+		addHp : function ( n ) {
 			if (parseInt(n) == n) this.hp += Math.floor( n ) * this._damageEffectMult;
 			this.hp = clamp(this.hp, 0, this._maxHP);
 		},
-		
-		addMana : function ( n ) { 
+
+		addMana : function ( n ) {
 			if (parseInt(n) == n) this.mana += Math.floor( n );
 			this.mana = clamp(this.mana, 0, this._maxMana);
 		},
-		
-		addStamina : function ( n ) { 
+
+		addStamina : function ( n ) {
 			if (parseInt(n) == n) this.stamina += Math.floor( n );
 			this.stamina = clamp(this.stamina, 0, this._maxStamina);
 		},
-		
-		addCloth : function ( n ) { 
+
+		addCloth : function ( n ) {
 			if (parseInt(n) == n) this.cloth += Math.floor( n );
 			this.cloth = Math.max(this.cloth, 0);
 		},
-		
-		hitHp : function ( n ) { 
+
+		hitHp : function ( n ) {
 			//console.log("Damage: " + n);
 			var x = Math.floor( n );
 			if (parseInt(x) == x) {
@@ -472,7 +472,7 @@ $(document).ready(function () {
 				this.hp -= x;
 				this.hp = clamp(this.hp, 0, this._maxHP);
 				windowController.setDamage(x);
-				
+
 				if (this.isFocused) {
 					if(this.isRestrained) x *= 1.5;
 					if(this.isDisoriented) x += this.isDisoriented;
@@ -481,48 +481,48 @@ $(document).ready(function () {
 				}
 			}
 		},
-		
+
 		hitMana : function ( n ) {
-			var x = Math.floor( n );			
+			var x = Math.floor( n );
 			if (parseInt(x) == x) this.mana -= x;
 			this.mana = clamp(this.mana, 0, this._maxMana);
 		},
-		
-		hitStamina : function ( n ) { 
+
+		hitStamina : function ( n ) {
 			var x = Math.floor( n );
 			if (parseInt(x) == x) this.stamina -= x;
 			this.stamina = clamp(this.stamina, 0, this._maxStamina);
 		},
-		
+
 		hitCloth : function ( n ) {
-			var x = Math.floor( n );			
+			var x = Math.floor( n );
 			if (parseInt(x) == x) this.cloth -= x  * this._damageEffectMult;
 			this.cloth = Math.max(this.cloth, 0);
 		},
-		
+
 		pickFatality : function() {
 			var fatalities = [
-			"Decapitation", 
-			"Strangulation", 
-			"Beating to death", 
-			"Exposing internal organs", 
-			"Blood loss", 
-			"Heart damage", 
-			"Brain damage", 
-			"Breaking Neck", 
-			"Breaking bones", 
-			"Dismemberment", 
+			"Decapitation",
+			"Strangulation",
+			"Beating to death",
+			"Exposing internal organs",
+			"Blood loss",
+			"Heart damage",
+			"Brain damage",
+			"Breaking Neck",
+			"Breaking bones",
+			"Dismemberment",
 			"Crushing",
-			"Severing the jaw", 
-			"Remove top part of a head", 
-			"Maceration", 
-			"Brutality!", 
-			"Slow and sensual death", 
+			"Severing the jaw",
+			"Remove top part of a head",
+			"Maceration",
+			"Brutality!",
+			"Slow and sensual death",
 			"Extremely staged and theatrical finisher" ];
-			
+
 			return fatalities[Math.floor(Math.random() * fatalities.length)];
 		},
-		
+
 		regen : function () {
 			if( !this.isUnconscious ) {
 				this.addMana(this.willpower() / 2);
@@ -531,78 +531,78 @@ $(document).ready(function () {
 				this.isStunned = true;
 			}
 		},
-		
+
 		getStatBlock : function () {
 			return "[color=cyan]" + this.name + " stats: Strength:" + this.strength() + " Dexterity:" + this.dexterity() + " Endurance:" + this.endurance() + " Intellect:" + this.intellect() + " Willpower:" + this.willpower() + "[/color]";
 		},
-		
+
 		getStatus : function () {
-			return "[color=orange]" + this.name + "[/color][color=yellow] health: " + this.hp + "[/color][color=green] stamina: " + this.stamina + "[/color] mana: " + this.mana + "|" + this._maxMana + "[color=purple] cloth: " + this.cloth + "[/color]" 
+			return "[color=orange]" + this.name + "[/color][color=yellow] health: " + this.hp + "[/color][color=green] stamina: " + this.stamina + "[/color] mana: " + this.mana + "|" + this._maxMana + "[color=purple] cloth: " + this.cloth + "[/color]"
 		},
-		
+
 		updateCondition : function () {
 			if ( this.isGrappledBy.length != 0 && !(this.isRestrained) ) this.isRestrained = true;
 			if ( this.isGrappledBy.length == 0 && this.isRestrained ) this.isRestrained = false;
-			
+
 			if ( this.hp <= Math.min(this._dizzyValue - (this.willpower() * 2), 0) && !(this.isDisoriented) ) {
 				this.isDisoriented = 1;
 				windowController.addHit( this.name + " is permanently dizzy! Stats penalty!" );
 			}
-			
+
 			if ( this.hp <= Math.min(this._koValue - (this.willpower() * 2), 0) && !(this.isUnconscious) ) {
 				this.isUnconscious = true;
 				windowController.addHit( this.name + " is permanently Knocked Out (or extremely dizzy, and can not resist)! Feel free to use this opportunity! " + this.name + " must not resist! Continue beating them to get a fatality suggestion." );
 			}
-			
-			if ( this.hp <= this._deathValue && !(this.isDead) ) { 
+
+			if ( this.hp <= this._deathValue && !(this.isDead) ) {
 				this.isDead = true;
 				windowController.addHit( this.name + " dies in the next move (or is already dead, as you wish to RP it). CLAIM YOUR SPOILS and VICTORY and FINISH YOUR OPPONENT!" );
 				windowController.addSpecial( "FATALITY SUGGESTION: " + this.pickFatality());
 				windowController.addSpecial( "It is just a suggestion, you may not follow it if you don't want to." );
 			}
 		},
-		
+
 		actionLight : function ( roll ) {
 			var attacker = this;
 			var target = battlefield.getTarget();
 			var damage = (roll / 2) + attacker.strength();
-			var stamDamage = attacker.intellect(); //This value + damage is drained from the targets stamina if the attack is successful			
+			var stamDamage = attacker.intellect(); //This value + damage is drained from the targets stamina if the attack is successful
 			var requiredStam = 20;
 			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 1; //Base difficulty, rolls greater than this amount will hit.
-		
+
 			if (attacker.isDisoriented) difficulty += 1; //Up the difficulty if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty if the attacker is restrained.
-			
+
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 3; //Lower it if the target is restrained.
 			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused.
-			
+
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
 				damage *= attacker.stamina / requiredStam;
-				windowController.addHint( attacker.name + " was too tired to be fully effective!" );			
+				windowController.addHint( attacker.name + " was too tired to be fully effective!" );
 			}
-			
+
 			attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
-			
+
 			if ( !target.isInMelee ) {
 				windowController.addHit( target.name + "IS TOO FAR AWAY! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
-			
+
 			if (roll <= difficulty ) {	//Miss-- no effect.
 				windowController.addHit( " MISS! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
-			
+
 			if( dexCheck <= target.dexterity() && !attacker.isGrappling(target)  ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
 				return 0; //Failed attack, if we ever need to check that.
-			}			
+			}
 
 			windowController.addHit( " HIT! " ); //Since the attack missed nor was dodged, we have a Hit!
-			
+
 			if( dexCheck <= 3 * target.dexterity() ){ //Partially blocked-- partial damage/effect... typically half the normal effect.
 				damage /= 2;
 				stamDamage /= 2;
@@ -613,7 +613,7 @@ $(document).ready(function () {
 				damage *= 2; //Only x2 in this case because this bonus will also factor into the stamina damage.
 				windowController.addHint( "Critical Hit! " + attacker.name + " landed a particularly vicious blow!" );
 			}
-			
+
 			//Deal all the actual damage/effects here.
 			damage = Math.max(damage, 1);
 			target.hitHp(damage);
@@ -621,7 +621,7 @@ $(document).ready(function () {
 			target.hitCloth(3);
 			return 1; //Successful attack, if we ever need to check that.
 		},
-		
+
 		actionHeavy : function ( roll ) {
 			var attacker = this;
 			var target = battlefield.getTarget();
@@ -629,97 +629,97 @@ $(document).ready(function () {
 			var requiredStam = 35;
 			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 8; //Base difficulty, rolls greater than this amount will hit.
-		
+
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty if the attacker is restrained.
-			
+
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 3; //Lower it if the target is restrained.
 			if (attacker.isFocused) difficulty -= 4; //Lower the difficulty if the attacker is focused
-			
+
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
 				damage *= attacker.stamina / requiredStam;
 				difficulty += 3; // Too tired? You're likely to miss.
-				windowController.addHint( attacker.name + " was too tired to be fully effective!" );			
+				windowController.addHint( attacker.name + " was too tired to be fully effective!" );
 			}
-			
+
 			attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
-			
+
 			if ( !target.isInMelee ) {
 				windowController.addHit( target.name + "IS TOO FAR AWAY! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
-			
+
 			if (roll <= difficulty ) {	//Miss-- no effect.
 				windowController.addHit( " MISS! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
-			
+
 			if( dexCheck <= target.dexterity() && !attacker.isGrappling(target) ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
 				return 0; //Failed attack, if we ever need to check that.
-			}			
+			}
 
 			windowController.addHit( " HIT! " ); //Since the attack missed nor was dodged, we have a Hit!
-			
+
 			if( dexCheck <= 3 * target.dexterity() ){ //Partially blocked-- partial damage/effect... typically half the normal effect.
 				damage /= 2;
 				windowController.addHint( target.name + " managed to escape the full brunt of the attack. " );
 			}
 
 			if ( dexCheck >= 40 - attacker.dexterity() ) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
-				damage *= 2; //Even at just x2 damage, a critical heavy is a game changer. 
+				damage *= 2; //Even at just x2 damage, a critical heavy is a game changer.
 				windowController.addHint( "Critical Hit! " + attacker.name + " landed a particularly vicious blow!" );
 			}
-			
+
 			//Deal all the actual damage/effects here.
 			damage = Math.max(damage, 1);
 			target.hitHp(damage);
 			target.hitCloth(5);
 			return 1; //Successful attack, if we ever need to check that.
-		},	
-		
+		},
+
 		actionGrab : function ( roll ) {
 			var attacker = this;
 			var target = battlefield.getTarget();
-			
+
 			var damage = (roll/2) + (attacker.strength()); //This value is increased on a submission hold or crit, and halved on a normal grab.
 			var requiredStam = 35;
 			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
-		
+
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
 			if (target.isDisoriented) difficulty -= 2; //Lower the difficulty if the target is dizzy.
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
-			
+
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
 				damage *= attacker.stamina / requiredStam;
 				difficulty += 6; // Too tired? You're likely to miss.
-				windowController.addHint( attacker.name + " was too tired to be fully effective!" );			
+				windowController.addHint( attacker.name + " was too tired to be fully effective!" );
 			}
-			
+
 			attacker.hitStamina (requiredStam - 20); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount. (We'll hit the attacker up for the rest on a miss or a dodge).
-			
+
 			if ( !target.isInMelee ) {
 				windowController.addHit( target.name + "IS TOO FAR AWAY! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
-			
+
 			if (roll <= difficulty ) {	//Miss-- no effect.
 				windowController.addHit( " FAILED! " );
 				windowController.addHint( target.name + " resisted the grab attempt!" );
 				attacker.hitStamina (20);
 				return 0; //Failed attack, if we ever need to check that.
 			}
-			
+
 			if( dexCheck <= target.dexterity() && !attacker.isGrappling(target) ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " was too fast, and escaped before " + attacker.name + " could establish a hold.");
 				attacker.hitStamina (20);
 				return 0; //Failed attack, if we ever need to check that.
-			}			
-			
+			}
+
 			if ( attacker.isGrappling( target ) ) { //Since the attack missed nor was dodged, we have a Hit!
 				windowController.addHit( " SUBMISSION " );
 				damage *= 2;
@@ -731,11 +731,11 @@ $(document).ready(function () {
 				}
 			} else {
 				damage /= 2;
-				windowController.addHit( attacker.name + " GRABBED " + target.name + "! " ); 
+				windowController.addHit( attacker.name + " GRABBED " + target.name + "! " );
 				windowController.addHint( target.name + " is being grappled! " + attacker.name + " can use Grab to try for a submission hold or Tackle to throw them - dealing damage, but setting them free." );
 				target.isGrappledBy.push( attacker.name );
-			}			
-			
+			}
+
 			if( dexCheck <= 3 * target.dexterity() ){ //Partially blocked-- partial damage/effect... typically half the normal effect.
 				attacker.hitStamina (10 + target.strength());
 				windowController.addHint( target.name + " put up quite a struggle, costing " + attacker.name + " additional stamina. ");
@@ -745,23 +745,23 @@ $(document).ready(function () {
 				damage += attacker.strength() * 2; //Adding additional the damage instead of straight multiplying it to avoid things getting totally ridiculous on a critical submission.
 				windowController.addHint( "Critical! " + attacker.name + " found a particularly damaging hold!" );
 			}
-			
+
 			//Deal all the actual damage/effects here.
 			damage = Math.max(damage, 1);
 			target.hitHp(damage);
 			target.hitCloth(4);
 			return 1; //Successful attack, if we ever need to check that.
 		},
-		
+
 		actionRip : function ( roll ) {
 			var attacker = this;
 			var target = battlefield.getTarget();
-			
+
 			if ( !target.isInMelee ) {
 				windowController.addHit( target.name + "IS TOO FAR AWAY! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
-				
+
 			if ( attacker.isGrappling( target ) ) {
 				target.hitCloth( roll * 2 );
 				windowController.addHit( attacker.name + " rips " + target.name + "'s clothes in a grab!" );
@@ -769,10 +769,10 @@ $(document).ready(function () {
 				target.hitCloth( roll );
 				windowController.addHit( attacker.name + " damages " + target.name + "'s clothes!" );
 			}
-			
+
 			return 1; //Successful attack, if we ever need to check that.
 		},
-		
+
 		actionTackle : function ( roll ) {
 			var attacker = this;
 			var target = battlefield.getTarget();
@@ -781,37 +781,37 @@ $(document).ready(function () {
 			var requiredStam = 40;
 			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
-		
+
 			if (attacker.isDisoriented) difficulty += 1; //Up the difficulty if the attacker is dizzy.
-			if (attacker.isRestrained) difficulty += 8; //Up the massively if the attacker is restrained.			
+			if (attacker.isRestrained) difficulty += 8; //Up the massively if the attacker is restrained.
 			if (!target.isInMelee) difficulty += 4; //Increase the difficulty if the target is not in melee, but don't make it impossible.
 			if (!target.isInMelee) requiredStam += 20; //Increase the stamina cost if the target is not in melee
-			
+
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 4; //Lower the difficulty if the target is restrained.
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
-			
+
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
 				damage *= attacker.stamina / requiredStam;
 				stamDamage *= attacker.stamina / requiredStam;
 				difficulty += 3; // Too tired? You're likely to miss.
-				windowController.addHint( attacker.name + " was too tired to be fully effective!" );			
+				windowController.addHint( attacker.name + " was too tired to be fully effective!" );
 			}
-			
+
 			attacker.hitStamina (requiredStam - 20); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount. (We'll hit the attacker up for the rest on a miss or a dodge).
-					
+
 			if (roll <= difficulty ) {	//Miss-- no effect.
 				windowController.addHit( " FAILED! " );
 				attacker.hitStamina (20);
 				return 0; //Failed attack, if we ever need to check that.
 			}
-			
+
 			if( dexCheck <= target.dexterity() && !attacker.isGrappling(target) ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
 				attacker.hitStamina (20);
 				return 0; //Failed attack, if we ever need to check that.
-			}			
+			}
 
 			if ( !target.isInMelee || !attacker.isInMelee ) {
 				windowController.addHit( attacker.name + " CHARGED " + target.name + ". ");
@@ -819,8 +819,8 @@ $(document).ready(function () {
 				attacker.isInMelee = true;
 				attacker.hitStamina (20);
 			}
-			
-			if( attacker.isGrappling( target ) ) { 
+
+			if( attacker.isGrappling( target ) ) {
 				target.removeGrappler( attacker );
 				if (target.isGrappling( attacker )){
 					attacker.removeGrappler( target );
@@ -833,12 +833,12 @@ $(document).ready(function () {
 			} else if ( target.isGrappling( attacker )){
 					attacker.removeGrappler( target );
 					windowController.addHit( attacker.name + " THREW " + target.name + " off! " + attacker.name + " can make another move in a row! "  + attacker.name + " is no longer at a penalty from being grappled!" );
-					windowController.addHint( target.name + ": You should make your post, but you should only emote being hit, do not try to perform any other actions." );			
+					windowController.addHint( target.name + ": You should make your post, but you should only emote being hit, do not try to perform any other actions." );
 			} else {
 				windowController.addHit( attacker.name + " TACKLED " + target.name + ". " + attacker.name + " can take another action while their opponent is stunned!" );
-				windowController.addHint( target.name + ": You should make your post, but you should only emote being hit, do not try to perform any other actions." );			
-			}			
-			
+				windowController.addHint( target.name + ": You should make your post, but you should only emote being hit, do not try to perform any other actions." );
+			}
+
 			if( dexCheck <= 3 * target.dexterity() ){ //Partially blocked-- partial damage/effect... typically half the normal effect.
 				stamDamage -= 20;
 				windowController.addHint( target.name + " managed to escape the full brunt of the attack. They are still stunned, but lost less stamina. " );
@@ -851,49 +851,49 @@ $(document).ready(function () {
 
 			//Deal all the actual damage/effects here.
 			damage = Math.max(damage, 1);
-			stamDamage = Math.max(stamDamage, 1);			
+			stamDamage = Math.max(stamDamage, 1);
 			target.hitHp(damage);
 			target.hitStamina(stamDamage);
-			target.isStunned = true;			
+			target.isStunned = true;
 			return 1; //Successful attack, if we ever need to check that.
 		},
-		
+
 		actionRanged : function ( roll ) {
 			var attacker = this;
 			var target = battlefield.getTarget();
 			var damage = (roll/2) + Math.max(attacker.dexterity(), attacker.intellect());
-			var requiredStam = 15; 
+			var requiredStam = 15;
 			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 5; //Base difficulty, rolls greater than this amount will hit.
-		
+
 			if (attacker.isDisoriented) difficulty += 3; //Up the difficulty considerably if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 5; //Up the difficulty considerably if the attacker is restrained.
-			
+
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 2; //Lower the difficulty slightly if the target is restrained.
 			if (attacker.isFocused) difficulty -= 5; //Lower the difficulty considerably if the attacker is focused
-			
+
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
 				damage *= attacker.stamina / requiredStam;
 				difficulty += 4; // Too tired? You're likely to miss.
-				windowController.addHint( attacker.name + " was too tired to be fully effective!" );			
+				windowController.addHint( attacker.name + " was too tired to be fully effective!" );
 			}
-			
+
 			attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
-			
+
 			if (roll <= difficulty ) {	//Miss-- no effect.
 				windowController.addHit( " MISS! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
-			
+
 			if( dexCheck <= target.dexterity() ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
 				return 0; //Failed attack, if we ever need to check that.
-			}			
+			}
 
 			windowController.addHit( " HIT! " ); //Since the attack missed nor was dodged, we have a Hit!
-			
+
 			if( dexCheck <= 3 * target.dexterity() ){ //Partially blocked-- partial damage/effect... typically half the normal effect.
 				damage /= 2;
 				windowController.addHint( target.name + " only took a flesh wound. " );
@@ -905,12 +905,12 @@ $(document).ready(function () {
 			}
 
 			//Deal all the actual damage/effects here.
-			damage = Math.max(damage, 1);			
+			damage = Math.max(damage, 1);
 			target.hitHp(damage);
 			target.hitCloth(3);
 			return 1; //Successful attack, if we ever need to check that.
 		},
-		
+
 		actionMagic : function ( roll ) {
 			var attacker = this;
 			var target = battlefield.getTarget();
@@ -918,36 +918,36 @@ $(document).ready(function () {
 			var requiredMana = 30;
 			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
-		
+
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if the attacker is restrained.
-			
+
 			if (target.isDisoriented) difficulty -= 1; //Lower the difficulty if the target is dizzy.
 			if (target.isRestrained) difficulty -= 2; //Lower the difficulty slightly if the target is restrained.
 			if (attacker.isFocused) difficulty -= 2; //Lower the difficulty if the attacker is focused
-			
+
 			if ( attacker.mana < requiredMana ) {	//Not enough mana-- reduced effect
 				damage *= attacker.mana / requiredMana;
 				difficulty += 4; // Too tired? You're likely to have your spell fizzle.
-				windowController.addHint( attacker.name + " was too low on mana to be fully effective!" );			
+				windowController.addHint( attacker.name + " was too low on mana to be fully effective!" );
 			}
-			
+
 			attacker.hitMana (requiredMana /2); //Now that required mana has been checked, reduce the attacker's mana by the appopriate amount. (We'll get the rest if the attack succeeds)
-			
+
 			if (roll <= difficulty ) {	//Miss-- no effect.
 				windowController.addHit( " FAILED! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
-			
+
 			if( dexCheck <= target.dexterity() ) {	//Dodged-- no effect.
 				windowController.addHit( " DODGE! " );
 				windowController.addHint( target.name + " dodged the attack. " );
 				return 0; //Failed attack, if we ever need to check that.
-			}			
+			}
 
-			attacker.hitMana (requiredMana /2); 
+			attacker.hitMana (requiredMana /2);
 			windowController.addHit( "MAGIC HIT! " ); //Since the attack missed nor was dodged, we have a Hit!
-			
+
 			if( dexCheck <= 3 * target.dexterity() ){ //Partially blocked-- partial damage/effect... typically half the normal effect.
 				damage /= 2;
 				windowController.addHint( target.name + " managed to avoid taking the full brunt of the attack. " );
@@ -955,33 +955,33 @@ $(document).ready(function () {
 
 			if ( dexCheck >= 40 - attacker.dexterity() ) { //Critical Hit-- increased damage/effect, typically 3x damage if there are no other bonuses.
 				damage *= 2; //Magical crits don't deal as much bonus damage, but...
-				target.isDisoriented = 1; //They tend to leave the target dazed 
+				target.isDisoriented = 1; //They tend to leave the target dazed
 				windowController.addHint( "Critical Hit! " + attacker.name + "'s magic worked abnormally well! " + target.name + " is dazed and disoriented.");
 			}
 
 			//Deal all the actual damage/effects here.
-			damage = Math.max(damage, 1);			
+			damage = Math.max(damage, 1);
 			target.hitHp(damage);
 			target.hitCloth(5);
-			return 1; //Successful attack, if we ever need to check that.			
+			return 1; //Successful attack, if we ever need to check that.
 		},
-		
+
 		actionRest : function ( roll ) {
 			var attacker = this;
-			
-			var difficulty = 4; //Base difficulty, rolls greater than this amount will succeed. 
-		
+
+			var difficulty = 4; //Base difficulty, rolls greater than this amount will succeed.
+
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if you are dizzy.
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if you are restrained.
 			if (!attacker.isInMelee) difficulty -= 4; //Lower the difficulty if you are not in melee.
-			
+
 			difficulty -= attacker.willpower() / 2;
-			
+
 			if (roll <= difficulty ) {	//Failed!
 				windowController.addHint( attacker.name + " was too disoriented or distracted to get any benefit from resting." );
 				return 0; //Failed action, if we ever need to check that.
 			}
-			
+
 			var stamBonus = 30 + (attacker.endurance() * 2);
 			attacker.addStamina(stamBonus);
 			windowController.addHit( attacker.name + " SKIPS MOVE, RESTING!" );
@@ -991,82 +991,82 @@ $(document).ready(function () {
 
 		actionFocus : function ( roll ) {
 			var attacker = this;
-			
+
 			var difficulty = 4; //Base difficulty, rolls greater than this amount will succeed.
-		
+
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if you are dizzy.
 			if (attacker.isRestrained) difficulty += 2; //Up the difficulty considerably if you are restrained.
 			if (!attacker.isInMelee) difficulty -= 4; //Lower the difficulty if you are not in melee.
-		
+
 			difficulty -= attacker.willpower() / 2;
-			
+
 			if (roll <= difficulty ) {	//Failed!
 				windowController.addHint( attacker.name + " was too disoriented or distracted to focus." );
 				return 0; //Failed action, if we ever need to check that.
 			}
-			
+
 			windowController.addHit( attacker.name + " FOCUSES/AIMS!" );
 			attacker.isFocused = (roll + attacker.willpower()) * 2;
 			return 1;
 		},
-		
+
 		actionChannel : function ( roll ) {
 			var attacker = this;
-			
-			var difficulty = 4; //Base difficulty, rolls greater than this amount will succeed. 
-		
+
+			var difficulty = 4; //Base difficulty, rolls greater than this amount will succeed.
+
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if you are dizzy.
 			if (attacker.isRestrained) difficulty += 4; //Up the difficulty considerably if you are restrained.
 			if (!attacker.isInMelee) difficulty -= 4; //Lower the difficulty if you are not in melee.
-			
+
 			difficulty -= attacker.willpower() / 2;
-		
+
 			if (roll <= difficulty ) {	//Failed!
 				windowController.addHint( attacker.name + " was too disoriented or distracted to channel." );
 				return 0; //Failed action, if we ever need to check that.
 			}
-			
+
 			var manaShift =  roll + (attacker.willpower() * 3);
 			manaShift = Math.min( manaShift, attacker.stamina);
 			manaShift = Math.min( manaShift, attacker._maxMana - attacker.mana);
-			
+
 			attacker.hitStamina(manaShift);
 			attacker.addMana(manaShift);
 			windowController.addHit( attacker.name + " CHANNELS STAMINA INTO MANA!" );
 			windowController.addHint( attacker.name + " recovered " + manaShift + " Mana!" );
 			return 1;
 		},
-		
+
 		actionMove : function ( roll ) {
 			var attacker = this;
 			var target = battlefield.getTarget();
 			var requiredStam = 20;
 			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
-		
+
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
 			if (attacker.isRestrained) difficulty += 6; //Up the difficulty considerably if the attacker is restrained.
-			
+
 			if (target.isDisoriented) difficulty -= 2; //Lower the difficulty if the attacker is dizzy.
 			if (target.isRestrained) difficulty -= 6; //Lower the difficulty considerably if the target is restrained.
-			
+
 			if ( attacker.stamina < requiredStam ) {	//Not enough stamina-- reduced effect
 				difficulty += 20; // Too tired? You're going to fail.
-				windowController.addHint( attacker.name + " was too tired." );			
+				windowController.addHint( attacker.name + " was too tired." );
 			}
-			
+
 			attacker.hitStamina (requiredStam); //Now that stamina has been checked, reduce the attacker's stamina by the appopriate amount.
-			
+
 			if (roll <= difficulty ) {	//Miss-- no effect.
 				windowController.addHit( "FAILED! " );
 				return 0; //Failed attack, if we ever need to check that.
 			}
-			
+
 			if( dexCheck <= target.dexterity() ) {	//Dodged-- no effect.
 				windowController.addHit( " NOT FAST ENOUGH! " );
 				windowController.addHint( target.name + " tried hard, but " + attacker.name + " was just too quick for them." );
 				return 0; //Failed attack, if we ever need to check that.
-			}			
+			}
 
 			if( dexCheck <= 3 * target.dexterity() ){ //Partially blocked-- partial damage/effect... typically half the normal effect.
 				attacker.hitStamina (10);
@@ -1077,37 +1077,37 @@ $(document).ready(function () {
 				windowController.addHint( target.name + " succeeded, and they were so quick they didn't even have to try that hard." );
 				attacker.addStamina (10);
 			}
-			
+
 			if( !target.isInMelee ) { //If you're not in melee, this becomes pursue.
 				target.IsInMelee = true;
 				attacker.isInMelee = true;
-				windowController.addHit( attacker.name + " closed the distance between them and " + target.name + ", and is now in melee with them." );				
+				windowController.addHit( attacker.name + " closed the distance between them and " + target.name + ", and is now in melee with them." );
 				return 1; //Successful attack, if we ever need to check that.
 			}
-			
+
 			if ( attacker.isGrappling( target ) ) { //If you're grappling someone they are freed.
-				target.removeGrappler( attacker );			
+				target.removeGrappler( attacker );
 				windowController.addHint( target.name + ", you are free from the grapple. " );
-			} 
-			
+			}
+
 			if( target.isGrappling( attacker ) ) { //If you were being grappled, you get free.
 				windowController.addHit( attacker.name + " ESCAPED " + target.name + "'s HOLD! " );
-				attacker.removeGrappler( target );			
+				attacker.removeGrappler( target );
 			} else { //Otherwise you open up some distance between you and your foe.
 				windowController.addHit( attacker.name + " managed to put some distance between them and " + target.name + ". " + target.name + " will have to pursue/find them before they use any melee attacks." );
 				attacker.isInMelee = false;
-				target.isInMelee = false;				
+				target.isInMelee = false;
 			}
 
 			//Deal all the actual damage/effects here.
-			
+
 			return 1; //Successful attack, if we ever need to check that.
 		},
 
 		actionFumble : function ( action ) {
 			var attacker = this;
-			
-			switch (action) 
+
+			switch (action)
 			{
 			case "Light":
 				attacker.hitStamina(10);
@@ -1135,12 +1135,12 @@ $(document).ready(function () {
 				break;
 			}
 		},
-		
+
 		isGrappling : function ( target ) {
 			if ( jQuery.inArray(this.name, target.isGrappledBy) != -1) return true;
 			return false;
 		},
-		
+
 		removeGrappler : function ( target ) {
 			var grappleIndex = jQuery.inArray(target.name, this.isGrappledBy);
 			this.isGrappledBy.splice( grappleIndex, 1 );
@@ -1157,27 +1157,27 @@ $(document).ready(function () {
 	//----------------------------------------------------------------------------------
 	// Event Handlers
 	//----------------------------------------------------------------------------------
-	
+
 	// Catch any changes to Endurance or Intellect and alter the current/maximum HP or Mana to match.
 	$( "fieldset[id^=Fighter]" ).each( function() {
 		$(this).find("input[name=Endurance]").change( function( event ) {
 			windowController.calcFormHP( this );
 		});
-		
+
 		$(this).find("input[name=Intellect]").change( function( event ) {
 			windowController.calcFormMana( this );
 		});
 	});
-	
+
 	// Mouseover tooltip events
 	$( windowController.getRolloverKeys().join(", ") ).mouseenter(function() {
 		windowController.setToolTip( $(this).attr("name") );
 		// console.log( windowController.rollovers[$(this).attr("name")] );
 	});
-	
+
 	// Take input from the setup form, add fighters to the arena, and then switch to the next panel.
 	$( "#InitialSetup" ).submit( function( event ) {
-		event.preventDefault();	
+		event.preventDefault();
 
 		// Get the global settings from the fieldset Arena
 		var arenaSettings = {};
@@ -1185,11 +1185,11 @@ $(document).ready(function () {
 			arenaSettings[this.name] = $(this).val();
 		});
 		battlefield.setGlobalFighterSettings(arenaSettings);
-		
+
 		// Clear the list of Fighters (just in case) and then get each fighters settings from the FighterN fieldsets. Any number of fighters could potentially be added, but currently the UI is only set up to allow two.
 		battlefield.clearFighters();
 		var fighterSettings = [ ];
-		
+
 		$( "fieldset[id^='Fighter']" ).each( function( index ) {
 			var settings = { };
 			$(this).find("input").each(function() {
@@ -1197,13 +1197,13 @@ $(document).ready(function () {
 			});
 			fighterSettings.push( settings )
 		});
-		
+
 		// Check and make sure there weren't any problems with the fighter settings that might have thrown an error.
 		var fightersAdded = 0;
 		for (var i = 0, len = fighterSettings.length; i < len; i++) {
 			fightersAdded += battlefield.addFighter(fighterSettings[i]);
 		};
-		
+
 		// And move on to the gameplay screen if there weren't errors.
 		if( fightersAdded == fighterSettings.length ) {
 			battlefield.pickInitialActor();
@@ -1213,20 +1213,20 @@ $(document).ready(function () {
 			battlefield.outputFighterStatus(); // Creates the fighter status blocks (HP/Mana/Stamina/Cloth)
 			battlefield.outputFighterStats(); // Creates the fighter stat blocks (STR/DEX/END/INT/WIL)
 			windowController.addInfo( "[url=http://www.f-list.net/c/rendezvous%20fight/]Visit this page for stage descriptions[/url]" );
-		} 	
-		
+		}
+
 		// Either way, update the output (which will display errors if there were any and post the battle start text to the gameplay screen).
 		windowController.updateOutput();
 	});
 
 	//Take input from the gameplay/combat form, provide the appropriate results, and run end of turn regen/cleanup.
 	$( "#CombatInput" ).submit( function( event ) {
-		event.preventDefault();	
+		event.preventDefault();
 		var action = $( "input:radio[name=action]:checked" ).val();
 		if(typeof action === 'undefined') return;
 		var actor = battlefield.getActor();
 		var roll = rollDice([20]);
-		
+
 		windowController.addAction(action);
 
 		// Fumble on a bad roll, act on a good roll. Each attack deteremines its own method of resolving hits vs. misses.
@@ -1236,12 +1236,12 @@ $(document).ready(function () {
 			windowController.addHit( " FUMBLE! " );
 			actor.actionFumble(action);
 		}
-		
+
 		windowController.addInfo("Raw Dice Roll: " + roll);
-		
+
 		battlefield.turnUpkeep(); //End of turn upkeep (Stamina regen, check for being stunned/knocked out, etc.)
 		battlefield.outputFighterStatus(); // Creates the fighter status blocks (HP/Mana/Stamina/Cloth)
-		//battlefield.outputFighterStats();			
+		//battlefield.outputFighterStats();
 		windowController.updateOutput(); //Tells the window controller to format and dump all the queued up messages to the results screen.
 	});
 });
@@ -1477,7 +1477,7 @@ BBParser = function () {
 				return g
 			}
 		};
-		
+
 	return {
 		Util: a,
 		parseBB: function (g) {
