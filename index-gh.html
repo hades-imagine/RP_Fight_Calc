@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>RP fight calc by hades-imagine</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <link rel="stylesheet" href="stylesheets/rf.css">
+    <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script-->
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <script src="javascripts/rf.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/hades-imagine/RF_Fight_Test">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/hades-imagine/RF_Fight_Test/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/hades-imagine/RF_Fight_Test/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>RP fight calc</h1>
+          <p></p>
+
+          <!-- ==================== -->
+          <!-- ==================== -->
+          <!-- ==================== -->
+	<div id="Setup" class="InputPanel">
+		<form id="InitialSetup">
+			<table class="FrameTable"><tr><td>
+			<fieldset id="Fighter1" class="StatBlock FormContainer">
+			<legend>Fighter One</legend>
+			<label>Name:</label> <input type="text" size="30" name="Name" value="Fighter One" /><br />
+			<br />
+			<label name="Strength">Strength:</label> <input type="text" size="3" name="Strength" value="4" /><br />
+			<label name="Dexterity">Dexterity:</label> <input type="text" size="3" name="Dexterity" value="4" /><br />
+			<label name="Endurance">Endurance:</label> <input type="text" size="3" name="Endurance" value="4" /><br />
+			<label name="Intellect">Intellect:</label> <input type="text" size="3" name="Intellect" value="4" /><br />
+			<label name="Willpower">Willpower:</label> <input type="text" size="3" name="Willpower" value="4" /><br />
+			<br />
+			<label name="HP">HP:</label> <input type="text" size="3" name="HP" value="100" /> out of a maximum of <span name="maxHP">100</span>.<br />
+			<label name="Mana">Mana:</label> <input type="text" size="3" name="Mana" value="40" /> out of a maximum of <span name="maxMana">100</span>.<br />
+			<label name="Stamina">Stamina:</label> <input type="text" size="3" name="Stamina" value="100" /> out of a maximum of 100.<br />
+			<label name="Cloth">Cloth:</label> <input type="text" size="3" name="Cloth" value="0" /> No maximum.<br />
+			</fieldset>
+			</td><td>
+			<fieldset id="Fighter2" class="StatBlock FormContainer">
+			<legend>Fighter Two</legend>
+			<label>Name:</label> <input type="text" size="30" name="Name" value="Fighter Two" /><br />
+			<br />
+			<label name="Strength">Strength:</label> <input type="text" size="3" name="Strength" value="4" /><br />
+			<label name="Dexterity">Dexterity:</label> <input type="text" size="3" name="Dexterity" value="4" /><br />
+			<label name="Endurance">Endurance:</label> <input type="text" size="3" name="Endurance" value="4" /><br />
+			<label name="Intellect">Intellect:</label> <input type="text" size="3" name="Intellect" value="4" /><br />
+			<label name="Willpower">Willpower:</label> <input type="text" size="3" name="Willpower" value="4" /><br />
+			<br />
+			<label name="HP">HP:</label> <input type="text" size="3" name="HP" value="100" /> out of a maximum of <span name="maxHP">100</span>.<br />
+			<label name="Mana">Mana:</label> <input type="text" size="3" name="Mana" value="40" /> out of a maximum of <span name="maxMana">100</span>.<br />
+			<label name="Stamina">Stamina:</label> <input type="text" size="3" name="Stamina" value="100" /> out of a maximum of 100.<br />
+			<label name="Cloth">Cloth:</label> <input type="text" size="3" name="Cloth" value="0" /> No maximum.<br />
+			</fieldset>
+			</td></tr><tr><td colspan="2"><hr>
+			<fieldset id="Arena" class="StatBlock">
+				<table class="WideFormContainer"><tr>
+				<td><label name="StatPoints">Stat Points:</label> <input type="text" size="3" name="StatPoints" value="20" /></td>
+				<td><label name="GameSpeed">Game Speed:</label> <input type="text" size="3" name="GameSpeed" value="1" /></td>
+				<td><label name="DisorientedAt">Dizzy:</label> <input type="text" size="3" name="DisorientedAt" value="40" /></td>
+				<td><label name="UnconsciousAt">KO:</label> <input type="text" size="3" name="UnconsciousAt" value="25" /></td>
+				<td><label name="DeadAt">Death:</label> <input type="text" size="3" name="DeadAt" value="0" /></td>
+				</tr></table>
+			</fieldset>
+			</td></tr><tr><td colspan="2">
+			<input type="submit" value="Check and Submit" class="WideButton" />
+			<div id="ErrorMessage" class="ErrorBox"></div>
+			</td></td></table>
+		</form>
+	</div>
+
+	<div id="Gameplay" class="InputPanel">
+		<form id="CombatInput">
+			<table class="FrameTable"><tr><td>
+			<fieldset id="Action" class="FormContainer RadioList">
+				<legend>Choose an action...</legend>
+				<input type="radio" name="action" value="Light" id="Light" disabled="disabled" /><label for="Light" name="Light">Light</label><br />
+				<input type="radio" name="action" value="Heavy" id="Heavy" disabled="disabled" /><label for="Heavy" name="Heavy">Heavy</label><br />
+				<input type="radio" name="action" value="Grab" id="Grab" disabled="disabled" /><label for="Grab" name="Grab">Grab</label><br />
+				<input type="radio" name="action" value="Tackle" id="Tackle" disabled="disabled" /><label for="Tackle" name="Tackle">Tackle</label><br />
+				<input type="radio" name="action" value="Ranged" id="Ranged" disabled="disabled" /><label for="Ranged" name="Ranged">Ranged</label><br />
+				<input type="radio" name="action" value="Focus" id="Focus" disabled="disabled" /><label for="Focus" name="Focus">Aim/Focus</label><br />
+				<input type="radio" name="action" value="Move" id="Move" disabled="disabled" /><label for="Move" name="Move">Escape/Pursue</label><br />
+				<input type="radio" name="action" value="Magic" id="Magic" disabled="disabled" /><label for="Magic" name="Magic">Magic</label><br />
+				<input type="radio" name="action" value="Channel" id="Channel" disabled="disabled" /><label for="Channel" name="Channel">Channel</label><br />
+				<input type="radio" name="action" value="Rest" id="Rest" disabled="disabled" /><label for="Rest" name="Rest">Skip/Rest</label><br />
+				<input type="radio" name="action" value="Rip" id="Rip" disabled="disabled" /><label for="Rip" name="Rip">Damage/Rip Clothes</label><br />
+			</fieldset>
+			</td><td rowspan="2" class="FullHeightCell">
+			<textarea id="CombatResult" class="ResultBox" rows=10 cols=120>Results...</textarea>
+			<div id="ParsedOutput" class="ThemedBox">test</div>
+			</td></tr><tr><td>
+			<input type="submit" value="Take Action" id="Take_Action" class="WideButton" disabled="disabled">
+			</td></tr></table>
+		</form>
+	</div>
+          <!-- ==================== -->
+          <!-- ==================== -->
+          <!-- ==================== -->
+	<div id="HoverTip" class="HoverBox"></div>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/hades-imagine">hades-imagine</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h3></h3>
+
+<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here <a href="https://guides.github.com/features/mastering-markdown/">using GitHub Flavored Markdown</a>, select a template crafted by a designer, and publish. After your page is generated, you can check out the new <code>gh-pages</code> branch locally. If you’re using GitHub Desktop, simply sync your repository and you’ll see the new branch.</p>
+
+<h3>Authors</h3>
+
+<p>Forked from <a href="https://github.com/NecroticBinder/RF_Fight_Test">NecroticBinder</a></p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
+  </body>
+</html>
