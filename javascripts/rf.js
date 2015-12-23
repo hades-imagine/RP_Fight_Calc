@@ -46,10 +46,29 @@ $(document).ready(function () {
 		return Math.max(min, Math.min(n, max));
 	};
 
+	var races = [
+		{
+			name: "Human",
+		},
+		{
+			name: "Animal",
+		},
+		{
+			name: "Elf",
+		},
+		{
+			name: "Orc",
+		},
+		{
+			name: "Other Monster",
+		},
+	]
+
 	//windowController is a collection of functions and message strings used to control what is actually output to the page. It doesn't need to be instantiated, it's not a class... just a handy way of collecting related items and referencing things.
 	var windowController = {
 		_tagParser : new BBParser(),
 		_rollovers : {
+			"Race" : "Race. <br /> Currently races are purely cosmetic, with no effect.",
 			"Strength" : "Strength. <br /> This is your base damage stat; the higher this is, the higher your basic attacks will be. This affects all attacks besides ranged attacks and magic.",
 			"Dexterity" : "Dexterity. <br /> This is your accuracy and dodge stat; the higher this is, the more likely you will be able to dodge attacks or reduce their effects, or strike with more precision on your own.",
 			"Endurance" : "Endurance. <br /> This is your basic defense stat; the higher this is the more health you will have and the faster your stamina will refill over time.",
@@ -360,6 +379,9 @@ $(document).ready(function () {
 		$.each(settings, function(key, value) {
 			if ((jQuery.inArray( key, nonNumericFields ) == -1) && (parseInt(value) != value)) errors.push( settings.Name + " settings are invalid: " + key + " cannot have a value of " + value + "." );
 		});
+
+		// get race
+		this._race = (+settings.Race)
 
 		//Set stats from settings
 		this._strength = (+settings.Strength);
@@ -1351,6 +1373,13 @@ $(document).ready(function () {
 		stageSelect.append($("<option />").val(i).text(arena.prototype.stages[i]));
 	};
 
+	// fill races
+	raceSelectors=$('#InitialSetup').find('select[name=Race]')
+	$.each(raceSelectors, function(){
+		for (i=0; i < races.length; i++) {
+			$(this).append($("<option />").val(i).text(races[i].name));
+		};
+	})
 
 	windowController.switchToPanel("Setup"); //Currently we start out on the form used to setup a fight, need to add an instructions panel at some point before v1.0
 	var battlefield = new arena(); //Create an arena named battlefield. It's important that this object is *outside* of the scope of any particular event function so that all event functions may access it.
@@ -1394,6 +1423,9 @@ $(document).ready(function () {
 
 		$( "fieldset[id^='Fighter']" ).each( function( index ) {
 			var settings = { };
+			$(this).find("select").each(function() {
+					settings[this.name] = $(this).val();
+			});
 			$(this).find("input").each(function() {
 					settings[this.name] = $(this).val();
 			});
