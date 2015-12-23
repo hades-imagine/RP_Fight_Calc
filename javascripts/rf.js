@@ -7,19 +7,37 @@ $(document).ready(function () {
 	// Functions and classes
 	//----------------------------------------------------------------------------------
 
+	function rand_luck(luck) {
+		alpha = beta = 1
+		if (luck == 0){
+			alpha = 0.1
+			beta = 5.3
+		} else if (luck == 10){
+			alpha = 5.3
+			beta = 0.1
+		}else	if (luck < 5){
+			alpha = Math.min(1, luck/2)
+			beta = 5.3 - luck
+		} else if (luck > 5){
+			alpha = luck - 4.7
+			beta = Math.min(1, luck/2)
+		}
+		return rbeta(alpha, beta)
+	}
+
 	// Pass rollDice an array of integers, get back a result as if each of those numbers were a die with that many sides.
 	// For example, rollDice ( [6,6,6] ) would return the result of a 3d6 roll, and rollDice([20]) would return the result of a 1d20 roll.
-	function rollDice( dice ) {
+	function rollDice( dice, luck) {
 		var total = 0;
 		for (var i = 0, len = dice.length; i < len; i++) {
-			total += Math.ceil(Math.random() * dice[i]);
+			total += Math.ceil(rand_luck(luck) * dice[i]);
 		}
 		return total;
 	};
 
 	// Pretty much what it says on the tin, returns 1 or 0 at random.
-	function coinflip() {
-		return Math.round(Math.random());
+	function coinflip(luck) {
+		return Math.round(rand_luck(luck));
 	};
 
 	// Force a value (n) onto the range min to max. Careful to pass this function only actual numeric values, if n, min, or max cannot be converted into a number, you'll just get back NaN as the result.
@@ -36,6 +54,7 @@ $(document).ready(function () {
 			"Endurance" : "Endurance. <br /> This is your basic defense stat; the higher this is the more health you will have and the faster your stamina will refill over time.",
 			"Intellect" : "Intellect. <br /> This is your magic stat; the higher this is, the more damage you will deal.",
 			"Willpower" : "Willpower. <br /> This is your mana-pool stat; the higher this is, the more magic attacks you can perform and the faster you will regain mana. Willpower also makes you more resistant to being knocked out or disoriented.",
+			"Luck" : "Luck. <br />Luck has no direct manipulation, but affects everything you do. Value 5 can be considered as 'normal luck'. Value 0 means that there is almost no chance of success, 10 always succeeds (if there is enough mana/stamina/etc).",
 			"HP" : "Hit Points. <br />How much health you have initially.",
 			"Mana" : "Mana. <br />How much mana you have initially.",
 			"Stamina" : "Stamina. <br />How much stamina you have initially.",
@@ -244,7 +263,7 @@ $(document).ready(function () {
 		this.stage = this.pickStage();
 
 		//Set default values for global settings
-		this._globalFighterSettings = { "GameSpeed" : 1, "StatPoints" : 20, "DeadAt" : 0, "UnconsciousAt" : 25, "DisorientedAt" : 40 };
+		this._globalFighterSettings = { "GameSpeed" : 1, "StatPoints" : 25, "DeadAt" : 0, "UnconsciousAt" : 25, "DisorientedAt" : 40 };
 	};
 
 	arena.prototype = {
@@ -353,6 +372,7 @@ $(document).ready(function () {
 		this._endurance = (+settings.Endurance);
 		this._intellect = (+settings.Intellect);
 		this._willpower = (+settings.Willpower);
+		this._luck = (+settings.Luck);
 
 		this._dizzyValue = globalSettings.DisorientedAt;
 		this._koValue = globalSettings.UnconsciousAt;
@@ -363,9 +383,10 @@ $(document).ready(function () {
 		if (this._dexterity > 10 || this._dexterity < 0) errors.push( settings.Name + "'s Dexterity is outside the allowed range (0 to 10).");
 		if (this._endurance > 10 || this._endurance < 0) errors.push( settings.Name + "'s Endurance is outside the allowed range (0 to 10).");
 		if (this._intellect > 10 || this._intellect < 0) errors.push( settings.Name + "'s Intellect is outside the allowed range (0 to 10).");
-		if (this._willpower > 10 || this._willpower < 0) errors.push( settings.Name + "'s Willpower is outside the allowed range (0 to 10).");		
+		if (this._willpower > 10 || this._willpower < 0) errors.push( settings.Name + "'s Willpower is outside the allowed range (0 to 10).");
+		if (this._luck > 10 || this._luck < 0) errors.push( settings.Name + "'s Luck is outside the allowed range (0 to 10).");
 
-		var stattotal = this._strength + this._dexterity + this._endurance +  this._intellect +  this._willpower;
+		var stattotal = this._strength + this._dexterity + this._endurance +  this._intellect +  this._willpower + this._luck;
 		if ( stattotal!= globalSettings.StatPoints && globalSettings.StatPoints != 0 )  errors.push( settings.Name + " has stats that are too high or too low (" + stattotal + " out of " + globalSettings.StatPoints + " points spent).");
 
 		if ( errors.length ) {
@@ -442,6 +463,10 @@ $(document).ready(function () {
 			total = Math.max(total, 1);
 			total = Math.ceil(total);
 			return total;
+		},
+
+		luck : function() {
+			return this._luck;
 		},
 
 		addHp : function ( n ) {
@@ -568,7 +593,7 @@ $(document).ready(function () {
 			var damage = (roll / 2) + attacker.strength();
 			var stamDamage = attacker.intellect(); //This value + damage is drained from the targets stamina if the attack is successful
 			var requiredStam = 20;
-			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
+			var dexCheck = rollDice([40], this._luck); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 1; //Base difficulty, rolls greater than this amount will hit.
 
 			if (attacker.isDisoriented) difficulty += 1; //Up the difficulty if the attacker is dizzy.
@@ -627,7 +652,7 @@ $(document).ready(function () {
 			var target = battlefield.getTarget();
 			var damage = roll + (2 * attacker.strength());
 			var requiredStam = 35;
-			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
+			var dexCheck = rollDice([40], this._luck); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 8; //Base difficulty, rolls greater than this amount will hit.
 
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
@@ -686,7 +711,7 @@ $(document).ready(function () {
 
 			var damage = (roll/2) + (attacker.strength()); //This value is increased on a submission hold or crit, and halved on a normal grab.
 			var requiredStam = 35;
-			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
+			var dexCheck = rollDice([40], this._luck); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
 
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
@@ -779,7 +804,7 @@ $(document).ready(function () {
 			var damage = (roll + attacker.strength())/4;
 			var stamDamage = 30;
 			var requiredStam = 40;
-			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
+			var dexCheck = rollDice([40], this._luck); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
 
 			if (attacker.isDisoriented) difficulty += 1; //Up the difficulty if the attacker is dizzy.
@@ -863,7 +888,7 @@ $(document).ready(function () {
 			var target = battlefield.getTarget();
 			var damage = (roll/2) + Math.max(attacker.dexterity(), attacker.intellect());
 			var requiredStam = 15;
-			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
+			var dexCheck = rollDice([40], this._luck); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 5; //Base difficulty, rolls greater than this amount will hit.
 
 			if (attacker.isDisoriented) difficulty += 3; //Up the difficulty considerably if the attacker is dizzy.
@@ -916,7 +941,7 @@ $(document).ready(function () {
 			var target = battlefield.getTarget();
 			var damage = damage = (roll/2) + (3 * attacker.intellect());
 			var requiredMana = 30;
-			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
+			var dexCheck = rollDice([40], this._luck); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
 
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
@@ -1041,7 +1066,7 @@ $(document).ready(function () {
 			var attacker = this;
 			var target = battlefield.getTarget();
 			var requiredStam = 20;
-			var dexCheck = rollDice([40]); //Roll used to check for Dodges, Blocks/Guards, and Crits.
+			var dexCheck = rollDice([40], this._luck); //Roll used to check for Dodges, Blocks/Guards, and Crits.
 			var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
 
 			if (attacker.isDisoriented) difficulty += 2; //Up the difficulty if the attacker is dizzy.
