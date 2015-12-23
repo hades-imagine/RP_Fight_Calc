@@ -4,7 +4,7 @@ fieldset {
 	border: none;
 }
 
-input,textarea {
+input,textarea,select {
 	background-color: #777;
 	border-color: #333;
 }
