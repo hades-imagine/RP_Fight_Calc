@@ -4,7 +4,7 @@ fieldset {
 	border: none;
 }
 
-input {
+input,textarea {
 	background-color: #777;
 	border-color: #333;
 }
@@ -73,7 +73,7 @@ legend {
 }
 
 td.FullHeightCell {
-	background-color:#fafafa;
+	/*background-color:#fafafa;*/
 	vertical-align: top;
 	min-width: 20em;
 }
@@ -108,12 +108,12 @@ td.FullHeightCell {
 
 .RadioWide input[type=radio]:hover + label,
 .RadioList input[type=radio]:hover + label {
-	background-color:#fff0b0;
+	background-color:#999060;
 }
 
 .RadioWide input[type=radio]:checked + label,
 .RadioList input[type=radio]:checked + label {
-	background-color:#f0e0a0;
+	background-color:#908050;
 }
 
 /* F-List BBCode text colors */
