@@ -1,10 +1,13 @@
+-----------  Ideas  -----------------
+  - Make stages important - change stats of players?
+  - Player races? Could be useful together with important stages.
 
 -----------  Patch Notes  -----------------
 v.0.9.6 (Dec 23th, 2015)
   - Forked by Hades
   - Changed page visuals
   - Added luck stat. Luck affects every roll.
-  
+
 v.0.9.5.6 (May 8th, 2014):
   - The difficulty of escaping a grapple, throwing someone when grappling, using magic while grappled, and using submission moves are all now affected by the relative strength scores of the combatants.
   - Misses, dodges, and fumbles on Light Attacks, Heavy Attacks, Grabs, and Tackles will now cost between 2 and 20 stamina less than the full normal cost, based on your Intellect score. Note that the 'full cost' for Grabs and Tackles is 35 or 40, respectively, though the actual amount you pay for either is often reduced.

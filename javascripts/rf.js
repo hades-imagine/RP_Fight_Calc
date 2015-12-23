@@ -265,6 +265,8 @@ $(document).ready(function () {
 			if(parseInt( settings.UnconsciousAt ) == settings.UnconsciousAt ) this._globalFighterSettings.UnconsciousAt = Math.max(settings.UnconsciousAt,  this._globalFighterSettings.DeadAt);
 			if(parseInt( settings.DisorientedAt ) == settings.DisorientedAt ) this._globalFighterSettings.DisorientedAt = Math.max(settings.DisorientedAt,  this._globalFighterSettings.UnconsciousAt);
 			if( !(isNaN(settings.GameSpeed)) ) this._globalFighterSettings.GameSpeed = settings.GameSpeed;
+			this._stageId = parseInt(settings.StageSelect)
+			this.stage = this.pickStage();
 		},
 
 		addFighter : function ( settings ) {
@@ -314,25 +316,26 @@ $(document).ready(function () {
 			windowController.setActionButton( this._fighters[this._currentFighter].name );
 		},
 
+		stages : [
+			"Arena",
+			"Cafe",
+			"Castle",
+			"Dark Alley",
+			"Dark Cave",
+			"Dungeon",
+			"Forest",
+			"House",
+			"Park",
+			"Skyscraper Roof",
+			"Street road",
+			"Subway",
+			"Swamp",
+			],
 		pickStage : function() {
-			var stages = [
-				"The Pit",
-				"RF:Wrestling Ring",
-				"Arena",
-				"Subway",
-				"Skyscraper Roof",
-				"Forest",
-				"Cafe",
-				"Street road",
-				"Alley",
-				"Park",
-				"RF:MMA Hexagonal Cage",
-				"Hangar",
-				"Swamp",
-				"RF:Glass Box",
-				"RF:Free Space" ];
-
-			return stages[Math.floor(Math.random() * stages.length)];
+			if(isNaN(this._stageId) || this._stageId == -1){
+				this._stageId = Math.floor(Math.random() * this.stages.length)
+			}
+			return this.stages[this._stageId];
 		},
 
 		turnUpkeep : function () {
@@ -1341,6 +1344,14 @@ $(document).ready(function () {
 	// One time events (Setting the default visibility of panels, for example)
 	// Objects and variables not tied to a particular event
 	//----------------------------------------------------------------------------------
+	// allow manual stage selection
+	var stageSelect = $("#StageSelect");
+	stageSelect.append($("<option />").val(-1).text("Random"));
+	for (i=0; i < arena.prototype.stages.length; i++) {
+		stageSelect.append($("<option />").val(i).text(arena.prototype.stages[i]));
+	};
+
+
 	windowController.switchToPanel("Setup"); //Currently we start out on the form used to setup a fight, need to add an instructions panel at some point before v1.0
 	var battlefield = new arena(); //Create an arena named battlefield. It's important that this object is *outside* of the scope of any particular event function so that all event functions may access it.
 
@@ -1371,6 +1382,9 @@ $(document).ready(function () {
 		var arenaSettings = {};
 		$( "fieldset[id='Arena']" ).find("input").each(function() {
 			arenaSettings[this.name] = $(this).val();
+		});
+		$( "fieldset[id='Arena']" ).find("select").each(function() {
+				arenaSettings[this.name] = $(this).val();
 		});
 		battlefield.setGlobalFighterSettings(arenaSettings);
 
