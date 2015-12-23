@@ -1,3 +1,5 @@
+Hosted on: http://hades-imagine.github.io/RP_Fight_Calc/
+
 -----------  Ideas  -----------------
   - More stages and races?
 
