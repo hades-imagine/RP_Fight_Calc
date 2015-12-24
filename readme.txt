@@ -2,6 +2,12 @@ Hosted on: http://hades-imagine.github.io/RP_Fight_Calc/
 
 -----------  Ideas  -----------------
   - More stages and races?
+  - Remove player's switching - so it is GM who selects who is on turn.
+  - History? Perhaps just save the states into a log and replay,
+    certainly no re-rolls unless different player is choosen. Or maybe allow
+    some "override" button, because GM can click on a different action than
+    player wanted, which unlocks re-rolls?
+  - Make stage names more as location types than specific locations.
 
 -----------  Patch Notes  -----------------
 v.0.9.6 (Dec 23th, 2015)
